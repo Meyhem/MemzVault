@@ -9,7 +9,7 @@ namespace MemzVault.Core.Test
         [Test]
         public void TestInit()
         {
-            var pak = new PassphraseEncryptedPacket(new byte[0], new byte[0]);
+            var pak = new PassphraseEncryptedPacket(new byte[0], new byte[0], new byte[0]);
 
             Assert.IsEmpty(pak.CipherText);
             Assert.IsEmpty(pak.IV);
@@ -18,7 +18,7 @@ namespace MemzVault.Core.Test
         [Test]
         public void TestToBase64ConversionEmpty()
         {
-            var pak = new PassphraseEncryptedPacket(new byte[0], new byte[0]);
+            var pak = new PassphraseEncryptedPacket(new byte[0], new byte[0], new byte[0]);
             Assert.AreEqual(pak.ToString(), ".");
         }
 
@@ -27,7 +27,7 @@ namespace MemzVault.Core.Test
         {
             var buf = new byte[] { 1, 2, 3 };
             var base64buf = Convert.ToBase64String(buf);
-            var pak = new PassphraseEncryptedPacket(buf, buf);
+            var pak = new PassphraseEncryptedPacket(new byte[0], buf, buf);
 
             Assert.AreEqual(pak.ToString(), $"{base64buf}.{base64buf}");
         }
@@ -37,7 +37,7 @@ namespace MemzVault.Core.Test
         {
             var buf = new byte[] { 1, 2, 3 };
             var base64buf = Convert.ToBase64String(buf);
-            var pak = PassphraseEncryptedPacket.FromString($"{base64buf}.{base64buf}");
+            var pak = PassphraseEncryptedPacket.FromString(new byte[0], $"{base64buf}.{base64buf}");
 
             Assert.AreEqual(pak.IV, buf);
             Assert.AreEqual(pak.CipherText, buf);
