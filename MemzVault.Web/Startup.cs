@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using System;
 using Microsoft.IdentityModel.Tokens;
 using MemzVault.Web.Extensions;
+using MemzVault.Core.Config;
+using MemzVault.Core.Crypto;
 
 namespace MemzVault.Web
 {
@@ -21,8 +22,9 @@ namespace MemzVault.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-
             var jwtSigningKey = Config.GetIssuerSigningKey();
+
+            services.Configure<MemzConfig>(Config.GetSection("Memz"));
 
             services.AddAuthentication(auth => 
             {
@@ -32,12 +34,14 @@ namespace MemzVault.Web
             .AddJwtBearer(jwt =>
             {
                 Config.GetSection("Jwt").Bind(jwt);
-                jwt.TokenValidationParameters = jwt.TokenValidationParameters ?? new();
+                jwt.TokenValidationParameters ??= new();
                 jwt.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(jwtSigningKey);
             });
 
             services.AddAuthorization();
             services.AddLogging();
+
+            services.AddTransient<ICryptoService, CryptoService>();
 
             services.AddMvc();
         }

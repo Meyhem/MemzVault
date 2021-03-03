@@ -40,5 +40,10 @@ namespace MemzVault.Core.Exceptions
         {
             return $"({ErrorCode}) {Message}";
         }
+
+        public static MemzException FromException(Exception ex, MemzErrorCode code = MemzErrorCode.Unknown)
+        {
+            return new MemzException(code, ex.Message, ex);
+        }
     }
 }

@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
 
 namespace MemzVault.Core.Crypto
 {
-    public class CryptoService
+    public class CryptoService : ICryptoService
     {
         public const int KeySize = 256 / 8;
         public const int BlockSize = 128 / 8;
@@ -41,7 +40,7 @@ namespace MemzVault.Core.Crypto
 
             cs.Write(plaintext);
             cs.Close();
-            
+
             return new PassphraseEncryptedPacket(passphrase, aes.IV, output.ToArray());
         }
 
@@ -53,7 +52,7 @@ namespace MemzVault.Core.Crypto
 
             using var input = new MemoryStream(pak.CipherText);
             using var cs = new CryptoStream(input, transform, CryptoStreamMode.Read);
-            
+
             var decr = new MemoryStream();
             cs.CopyTo(decr);
             cs.Close();
@@ -67,7 +66,7 @@ namespace MemzVault.Core.Crypto
             iv = StretchKey(iv, IvSize);
 
             var aes = CreateCipher(iv, key);
-            
+
             var transform = aes.CreateEncryptor();
             return new CryptoStream(src, transform, CryptoStreamMode.Read);
         }
@@ -82,7 +81,7 @@ namespace MemzVault.Core.Crypto
             var transform = aes.CreateDecryptor();
             return new CryptoStream(src, transform, CryptoStreamMode.Read);
         }
-        
+
         private SymmetricAlgorithm CreateCipher(byte[] iv, byte[] key)
         {
             var aes = Aes.Create();
