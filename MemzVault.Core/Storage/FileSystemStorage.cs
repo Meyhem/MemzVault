@@ -47,7 +47,7 @@ namespace MemzVault.Core.Storage
         public async Task<byte[]> ReadRepositoryManifest(string repo)
         {
             repo = NormalizeRepositoryName(repo);
-            AssertRepositoryExists(repo);
+            await AssertRepositoryExists(repo);
 
             var manifestFname = GetRepositoryManifestPath(repo);
 
@@ -57,7 +57,7 @@ namespace MemzVault.Core.Storage
         public async Task WriteRepositoryManifest(string repo, byte[] manifest)
         {
             repo = NormalizeRepositoryName(repo);
-            AssertRepositoryExists(repo);
+            await AssertRepositoryExists(repo);
 
             var manifestFname = GetRepositoryManifestPath(repo);
 
@@ -85,7 +85,7 @@ namespace MemzVault.Core.Storage
         public async Task WriteItem(string repo, string itemId, Stream encryptedStream)
         {
             repo = NormalizeRepositoryName(repo);
-            AssertRepositoryExists(repo);
+            await AssertRepositoryExists(repo);
 
             var itemPath = GetItemPath(repo, itemId);
 
@@ -150,25 +150,25 @@ namespace MemzVault.Core.Storage
             repo = NormalizeRepositoryName(repo);
             if (!File.Exists(GetItemPath(repo, itemId)))
             {
-                throw new MemzException(MemzErrorCode.ItemNotFound, $"Repository {repo} does not exist");
+                throw new MemzException(MemzErrorCode.ItemNotFound, $"Item {itemId} does not exist in {repo}");
             }
         }
 
-        private void AssertRepositoryExists(string repo)
+        private async Task AssertRepositoryExists(string repo)
         {
             repo = NormalizeRepositoryName(repo);
-            if (!RepositoryExists(repo))
+            if (!await RepositoryExistsAsync(repo))
             {
                 throw new MemzException(MemzErrorCode.RepositoryNotfound, $"Repository {repo} does not exist");
             }
         }
 
-        private bool RepositoryExists(string repo)
+        public async Task<bool> RepositoryExistsAsync(string repo)
         {
             repo = NormalizeRepositoryName(repo);
             var repoPath = GetRepositoryPath(repo);
 
-            return Directory.Exists(repoPath);
+            return await Task.FromResult(Directory.Exists(repoPath));
         }
 
         private string NormalizeRepositoryName(string r)

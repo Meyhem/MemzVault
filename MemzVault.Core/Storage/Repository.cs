@@ -8,14 +8,14 @@ using MemzVault.Core.Exceptions;
 
 namespace MemzVault.Core.Storage
 {
-    public class Repository
+    public class Repository : IRepository
     {
         const int RepositoryVersion = 0x0001;
 
         private readonly IStorageDriver driver;
-        private readonly CryptoService crypto;
+        private readonly ICryptoService crypto;
 
-        public Repository(IStorageDriver driver, CryptoService crypto)
+        public Repository(IStorageDriver driver, ICryptoService crypto)
         {
             this.driver = driver;
             this.crypto = crypto;
@@ -30,6 +30,11 @@ namespace MemzVault.Core.Storage
 
             await driver.CreateRepositoryAsync(repo);
             await SetRepositoryManifest(repo, manifest);
+        }
+
+        public async Task<bool> RepositoryExists(string repo)
+        {
+            return await driver.RepositoryExistsAsync(repo);
         }
 
         public async Task<RepositoryManifest> GetRepositoryManifest(string repo)
@@ -67,12 +72,6 @@ namespace MemzVault.Core.Storage
             var serializedPacket = Encoding.ASCII.GetString(encryptedMetadata);
             var encodedPassphrase = Encoding.UTF8.GetBytes(passphrase);
             var packet = PassphraseEncryptedPacket.FromString(encodedPassphrase, serializedPacket);
-            
-
-            if (!packet.CheckIntegrity(encodedPassphrase))
-            {
-                throw new MemzException(MemzErrorCode.IntegrityCheckFailed, $"Integrity verification failed for metadata {itemId}");
-            }
 
             var binaryMetadata = crypto.PassphraseDecrypt(encodedPassphrase, packet);
             var rawJson = Encoding.UTF8.GetString(binaryMetadata);
@@ -104,7 +103,7 @@ namespace MemzVault.Core.Storage
             return (dataStream, meta);
         }
 
-        private async Task<byte[]> GetRepositoryMasterKey(string repo, string passphrase)
+        public async Task<byte[]> GetRepositoryMasterKey(string repo, string passphrase)
         {
             var manifest = await GetRepositoryManifest(repo);
             var repositoryPassphrase = Encoding.UTF8.GetBytes(passphrase);

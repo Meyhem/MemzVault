@@ -1,5 +1,8 @@
 ﻿
 namespace MemzVault.Core.Config
 {
-    public record MemzConfig(string StorageFolder);
+    public record MemzConfig
+    {
+        public string StorageFolder { get; set; }
+    }
 }

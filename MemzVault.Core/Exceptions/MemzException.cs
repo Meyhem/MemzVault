@@ -13,7 +13,10 @@ namespace MemzVault.Core.Exceptions
         ItemNotFound,
 
         // Crypto Ops
-        IntegrityCheckFailed
+        IntegrityCheckFailed,
+
+        // Auth
+        InvalidPassphrase
     }
 
 

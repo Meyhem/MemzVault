@@ -4,51 +4,82 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MemzVault.Core.Crypto;
+using MemzVault.Core.Exceptions;
+using MemzVault.Core.Storage;
 using MemzVault.Web.Extensions;
+using MemzVault.Web.Features.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MemzVault.Web.Features.Auth
 {
     [Route("api/auth")]
-    public class AuthController : Controller
+    public class AuthController : MemzController
     {
-        private readonly IConfiguration config;
-        private readonly ICryptoService cryptoService;
         private readonly JwtBearerOptions jwtOptions;
 
-        public AuthController(
-            IConfiguration config, 
-            IOptionsMonitor<JwtBearerOptions> jwtOptions, 
-            ICryptoService cryptoService)
+        public AuthController(IOptionsMonitor<JwtBearerOptions> jwtOptions)
         {
-            this.config = config;
-            this.cryptoService = cryptoService;
             this.jwtOptions = jwtOptions.Get(JwtBearerDefaults.AuthenticationScheme);
         }
 
+        [HttpPost]
         [Route("token")]
-        public async Task CreateToken([FromBody] CreateTokenModel model)
+        public async Task<IActionResult> CreateToken([FromBody] CreateTokenModel model)
         {
-            var jwt = new JwtSecurityTokenHandler();
-            var key = config.GetIssuerSigningKey();
-            var serverKey = config.GetServerKey();
-
-
-            var encryptedPassphrase = cryptoService.PassphraseEncrypt(serverKey, Encoding.UTF8.GetBytes(model.Passphrase));
-
-
-            jwt.CreateToken(new() 
+            if (!await Repository.RepositoryExists(model.Repository))
             {
-                Issuer = jwtOptions.Authority,
-                Audience = jwtOptions.Audience,
+                return BadRequest(
+                    new ApiResponse<object>(
+                        new MemzException(
+                            MemzErrorCode.RepositoryNotfound, 
+                            $"Repository {model.Repository} not found"
+                        )
+                    )
+                );
+            }
+
+            try
+            {
+                await Repository.GetRepositoryMasterKey(model.Repository, model.Passphrase);
+            } 
+            catch (MemzException ex) when (ex.ErrorCode == MemzErrorCode.IntegrityCheckFailed)
+            {
+                return BadRequest(ApiResponse.FromMemzException(ex));
+            }
+            
+            var jwt = new JwtSecurityTokenHandler();
+            var key = Configuration.GetIssuerSigningKey();
+            var serverKey = Configuration.GetServerKey();
+
+            var encryptedPassphrase = CryptoService.PassphraseEncrypt(serverKey, Encoding.UTF8.GetBytes(model.Passphrase));
+
+            var tok = jwt.CreateToken(new() 
+            {
+                Issuer = jwtOptions.TokenValidationParameters.ValidIssuer,
+                Audience = jwtOptions.TokenValidationParameters.ValidAudience,
                 Expires = DateTime.UtcNow.AddHours(1),
-                Subject = new ClaimsIdentity(new Claim[] { new("encryptedPassphrase", encryptedPassphrase.ToString()) })
+                Subject = new ClaimsIdentity(new Claim[] { new(Const.EncryptedPassphraseClaimType, encryptedPassphrase.ToString()) }),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             });
 
-            await Task.CompletedTask;
+            var str = jwt.WriteToken(tok);
+
+            return Ok(ApiResponse.FromData(str));
+        }
+
+        [HttpPost]
+        [Route("test")]
+        [Authorize]
+        public IActionResult Validity()
+        {
+            var p = GetPassphrase();
+
+            return Ok();
         }
     }
 }
