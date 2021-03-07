@@ -55,7 +55,7 @@ namespace MemzVault.Web
             }
 
             app.UseRouting();
-            
+            app.UseCors(c => c.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseAuthorization();
             

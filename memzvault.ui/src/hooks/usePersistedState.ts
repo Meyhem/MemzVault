@@ -1,13 +1,21 @@
-import { atom, AtomOptions, RecoilState, useRecoilState } from 'recoil'
+import {
+  atom,
+  AtomOptions,
+  RecoilState,
+  useRecoilState,
+  SetterOrUpdater,
+} from 'recoil'
 
 export function persistedAtom<T>(cfg: AtomOptions<T>) {
   return atom<T>({
     ...cfg,
-    default: JSON.parse(localStorage.getItem(cfg.key) || '') || cfg.default,
+    default: JSON.parse(localStorage.getItem(cfg.key)) || cfg.default,
   })
 }
 
-export function usePersistedState<T>(recoilState: RecoilState<T>) {
+export function usePersistedState<T>(
+  recoilState: RecoilState<T>
+): [T, SetterOrUpdater<T>] {
   const [state, setState] = useRecoilState(recoilState)
 
   return [

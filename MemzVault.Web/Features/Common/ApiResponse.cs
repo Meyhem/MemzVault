@@ -32,7 +32,7 @@ namespace MemzVault.Web.Features.Common
 
         public static ApiResponse<object> FromMemzException(MemzException ex)
         {
-            return new(MemzError.FromMemzException(ex));
+            return new(null, MemzError.FromMemzException(ex));
         }
     }
 }

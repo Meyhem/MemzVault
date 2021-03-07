@@ -1,0 +1,8 @@
+{
+  "validation": {
+    "Required": "Value or BTFO"
+  },
+  "memzErrorCode": {
+    "RepositoryNotFound": "Repo not found, you're in detroit anyway."
+  }
+}

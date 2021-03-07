@@ -34,9 +34,9 @@ namespace MemzVault.Web.Features.Auth
             if (!await Repository.RepositoryExists(model.Repository))
             {
                 return BadRequest(
-                    new ApiResponse<object>(
+                    ApiResponse.FromMemzException(
                         new MemzException(
-                            MemzErrorCode.RepositoryNotfound, 
+                            MemzErrorCode.RepositoryNotFound, 
                             $"Repository {model.Repository} not found"
                         )
                     )
@@ -49,7 +49,7 @@ namespace MemzVault.Web.Features.Auth
             } 
             catch (MemzException ex) when (ex.ErrorCode == MemzErrorCode.IntegrityCheckFailed)
             {
-                return BadRequest(ApiResponse.FromMemzException(ex));
+                return BadRequest(ApiResponse.FromMemzException(new MemzException(MemzErrorCode.InvalidPassphrase, "Invalid repository passphrase")));
             }
             
             var jwt = new JwtSecurityTokenHandler();

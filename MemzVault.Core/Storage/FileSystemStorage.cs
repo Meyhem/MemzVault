@@ -159,7 +159,7 @@ namespace MemzVault.Core.Storage
             repo = NormalizeRepositoryName(repo);
             if (!await RepositoryExistsAsync(repo))
             {
-                throw new MemzException(MemzErrorCode.RepositoryNotfound, $"Repository {repo} does not exist");
+                throw new MemzException(MemzErrorCode.RepositoryNotFound, $"Repository {repo} does not exist");
             }
         }
 

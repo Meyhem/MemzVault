@@ -1,14 +1,13 @@
 import {
   color,
   grid,
-  flex,
+  flexbox,
   margin,
   padding,
   border,
   layout,
-  ColorProps,
-  GridProps,
-  FlexProps,
+  TypographyProps,
+  FlexboxProps,
   MarginProps,
   PaddingProps,
   BorderProps,
@@ -16,21 +15,22 @@ import {
 } from 'styled-system'
 
 import styled from 'styled-components'
+import { FunctionComponent } from 'react'
 
-export const Flex = styled.div<
-  ColorProps &
-    GridProps &
-    FlexProps &
-    MarginProps &
-    PaddingProps &
-    BorderProps &
-    LayoutProps
->`
+export type FlexProps = TypographyProps &
+  FlexboxProps &
+  MarginProps &
+  PaddingProps &
+  BorderProps &
+  LayoutProps
+
+export const Flex: FunctionComponent<FlexProps> = styled.div<FlexProps>`
   ${color}
   ${grid}
-  ${flex}
+  ${flexbox}
   ${margin}
   ${padding}
   ${border}
   ${layout}
+  display: flex;
 `

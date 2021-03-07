@@ -15,7 +15,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["react-hooks"],
+  "plugins": ["react-hooks", "@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
@@ -30,7 +30,9 @@
     }
   },
   "rules": {
+    "import/named": "off",
     "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
     "prettier/prettier": ["error"],
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",

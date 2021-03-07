@@ -1,6 +1,7 @@
 import { Route, Router, Switch } from 'react-router'
 import { ThemeProvider } from 'styled-components'
 import { RecoilRoot } from 'recoil'
+import './common/i18n'
 
 import { theme, GlobalStyle } from './common/theme'
 import { history } from './common/history'

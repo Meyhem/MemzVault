@@ -1,0 +1,8 @@
+{
+  "validation": {
+    "Required": "Required"
+  },
+  "memzErrorCode": {
+    "RepositoryNotFound": "Repository not found"
+  }
+}

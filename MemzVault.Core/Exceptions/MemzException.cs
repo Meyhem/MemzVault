@@ -8,7 +8,7 @@ namespace MemzVault.Core.Exceptions
 
         // Repository Ops
         RepositoryAlreadyExists,
-        RepositoryNotfound,
+        RepositoryNotFound,
         MetadataNotFound,
         ItemNotFound,
 
