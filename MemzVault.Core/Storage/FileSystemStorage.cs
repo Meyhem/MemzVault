@@ -1,5 +1,6 @@
 ﻿using MemzVault.Core.Config;
 using MemzVault.Core.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,6 +43,16 @@ namespace MemzVault.Core.Storage
             Directory.CreateDirectory(repoPath);
 
             return await Task.FromResult(repo);
+        }
+
+        public async Task<IEnumerable<string>> ListRepositoryItemIds(string repo)
+        {
+            await AssertRepositoryExists(repo);
+            var repoPath = GetRepositoryPath(repo);
+
+            return Directory.EnumerateFiles(repoPath)
+                .Where(p => Path.GetExtension(p).Equals(".meta", StringComparison.InvariantCultureIgnoreCase))
+                .Select(p => Path.GetFileNameWithoutExtension(p));
         }
 
         public async Task<byte[]> ReadRepositoryManifest(string repo)

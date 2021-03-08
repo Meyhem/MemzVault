@@ -15,5 +15,6 @@ namespace MemzVault.Core.Storage
         Task<Stream> ReadItem(string repo, string itemId);
         Task WriteRepositoryManifest(string repo, byte[] manifest);
         Task<bool> RepositoryExistsAsync(string repo);
+        Task<IEnumerable<string>> ListRepositoryItemIds(string repo);
     }
 }

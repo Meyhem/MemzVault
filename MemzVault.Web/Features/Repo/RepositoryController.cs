@@ -20,12 +20,21 @@ namespace MemzVault.Web.Features.Repo
 
         [HttpPost]
         [Route("")]
-        [AllowAnonymous]
         public async Task<IActionResult> CreateRepository([FromBody] CreateRepositoryRequest model)
         {
             await repo.CreateRepository(model.Repository, model.Passphrase);
 
             return StatusCode((int)HttpStatusCode.Created);
+        }
+
+        [HttpGet]
+        [Route("list")]
+        public async Task<ApiResponse<PagedData<StoredItemInfo>>> ListRepository([FromQuery] ApiPagedRequest model)
+        {
+            model.Normalize();
+            var (items, total) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), model.Offset, model.Limit);
+
+            return ApiResponse.FromData<PagedData<StoredItemInfo>>(new(items, total));
         }
     }
 }

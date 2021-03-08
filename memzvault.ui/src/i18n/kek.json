@@ -3,6 +3,7 @@
     "Required": "Value or BTFO"
   },
   "memzErrorCode": {
-    "RepositoryNotFound": "Repo not found, you're in detroit anyway."
+    "RepositoryNotFound": "Repo not found, fuck off back to reddit",
+    "InvalidPassphrase": "No, no, no... You didn't say the magic word"
   }
 }

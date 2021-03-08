@@ -3,15 +3,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using MemzVault.Core.Crypto;
 using MemzVault.Core.Exceptions;
-using MemzVault.Core.Storage;
 using MemzVault.Web.Extensions;
 using MemzVault.Web.Features.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -63,7 +60,11 @@ namespace MemzVault.Web.Features.Auth
                 Issuer = jwtOptions.TokenValidationParameters.ValidIssuer,
                 Audience = jwtOptions.TokenValidationParameters.ValidAudience,
                 Expires = DateTime.UtcNow.AddHours(1),
-                Subject = new ClaimsIdentity(new Claim[] { new(Const.EncryptedPassphraseClaimType, encryptedPassphrase.ToString()) }),
+                Subject = new ClaimsIdentity(new Claim[] 
+                { 
+                    new(Const.RepositoryNameClaimType, model.Repository),
+                    new(Const.EncryptedPassphraseClaimType, encryptedPassphrase.ToString()),
+                }),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
             });
 

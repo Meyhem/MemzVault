@@ -16,7 +16,8 @@ namespace MemzVault.Core.Exceptions
         IntegrityCheckFailed,
 
         // Auth
-        InvalidPassphrase
+        InvalidPassphrase,
+        InvalidRepository
     }
 
 

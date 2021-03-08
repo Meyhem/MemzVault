@@ -38,5 +38,17 @@ namespace MemzVault.Web.Features.Common
 
             return Encoding.UTF8.GetString(passphrase);
         }
+
+        protected string GetRepository()
+        {
+            var repo = User.Claims.SingleOrDefault(c => c.Type == Const.RepositoryNameClaimType);
+
+            if (repo == null || repo.Value == null)
+            {
+                throw new MemzException(MemzErrorCode.InvalidRepository, $"Identity does not contain valid {Const.RepositoryNameClaimType} claim");
+            }
+
+            return repo.Value;
+        }
     }
 }

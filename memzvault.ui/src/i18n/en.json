@@ -3,6 +3,7 @@
     "Required": "Required"
   },
   "memzErrorCode": {
-    "RepositoryNotFound": "Repository not found"
+    "RepositoryNotFound": "Repository not found",
+    "InvalidPassphrase": "Invalid passphrase"
   }
 }

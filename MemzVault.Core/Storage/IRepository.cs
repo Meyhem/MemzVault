@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MemzVault.Core.Storage
@@ -9,6 +10,7 @@ namespace MemzVault.Core.Storage
         Task<StoredItemMetadata> GetItemMetadata(string repo, string itemId, string passphrase);
         Task<RepositoryManifest> GetRepositoryManifest(string repo);
         Task<byte[]> GetRepositoryMasterKey(string repo, string passphrase);
+        Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, string passphrase, int offset, int limit);
         Task<bool> RepositoryExists(string repo);
         Task<(Stream, StoredItemMetadata)> RetrieveItem(string repo, string itemId, string passphrase);
         Task SetItemMetadata(string repo, string itemId, string passphrase, StoredItemMetadata meta);

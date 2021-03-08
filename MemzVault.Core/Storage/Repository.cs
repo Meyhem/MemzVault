@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MemzVault.Core.Crypto;
-using MemzVault.Core.Exceptions;
 
 namespace MemzVault.Core.Storage
 {
@@ -30,6 +31,28 @@ namespace MemzVault.Core.Storage
 
             await driver.CreateRepositoryAsync(repo);
             await SetRepositoryManifest(repo, manifest);
+        }
+
+        public async Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, string passphrase, int offset, int limit)
+        {
+            var ids = await driver.ListRepositoryItemIds(repo);
+            List<StoredItemInfo> ret = new();
+
+            foreach (var id in ids.Skip(offset).Take(limit))
+            {
+                var meta = await GetItemMetadata(repo, id, passphrase);
+
+                ret.Add(new StoredItemInfo
+                {
+                    ItemId = id,
+                    MimeType = meta.MimeType,
+                    Name = meta.Name,
+                    OriginalFileName = meta.OriginalFilename,
+                    Tags = meta.Tags
+                });
+            }
+
+            return (ret, ids.Count());
         }
 
         public async Task<bool> RepositoryExists(string repo)

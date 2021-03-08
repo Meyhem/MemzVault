@@ -17,7 +17,7 @@ import { tokenState } from '../state/tokenState'
 
 const StyledForm = styled.form`
   display: flex;
-  justify-content: right;
+  flex-direction: column;
   flex-wrap: wrap;
 `
 
@@ -78,7 +78,7 @@ export const LoginPage = () => {
                   />
                 )}
               />
-              <Flex alignItems="center">
+              <Flex justifyContent="right" alignItems="center">
                 {error && (
                   <span>
                     {t(`memzErrorCode:${response.data.error.errorCode}`)}
