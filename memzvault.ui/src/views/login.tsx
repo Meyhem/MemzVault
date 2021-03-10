@@ -29,7 +29,7 @@ export const LoginPage = () => {
   const [, setToken] = usePersistedState(tokenState)
   const { t } = useTranslation()
 
-  const { post, response, error } = useApi<MemzResponse<string>>({
+  const { post, response, loading } = useApi<MemzResponse<string>>({
     path: '/api/auth/token',
   })
 
@@ -37,12 +37,13 @@ export const LoginPage = () => {
     <Layout centered={true}>
       <BorderedBox padding={3}>
         <Form
+          initialValues={{ repository: 'repo1', passphrase: 'keks' }}
           onSubmit={async ({ repository, passphrase }) => {
             await post({ repository, passphrase })
 
             if (response.status === 200) {
               setToken(response.data.data)
-              history.push('/dashboard')
+              history.push('/repository')
             }
           }}
         >
@@ -78,14 +79,15 @@ export const LoginPage = () => {
                   />
                 )}
               />
+
               <Flex justifyContent="right" alignItems="center">
-                {error && (
+                {response?.data?.error?.errorCode && (
                   <span>
                     {t(`memzErrorCode:${response.data.error.errorCode}`)}
                   </span>
                 )}
                 <SubmitButton type="submit" disabled={submitting}>
-                  Go
+                  Go {loading && '<>'}
                 </SubmitButton>
               </Flex>
             </StyledForm>
