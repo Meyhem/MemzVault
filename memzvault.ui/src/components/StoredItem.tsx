@@ -19,6 +19,8 @@ function isImage(item: MetaItem) {
   return _.startsWith(item.mimeType, 'image')
 }
 
+//react-zoom-pan-pinch
+
 export const StoredItem: FC<StoredItemProps> = ({ item }) => {
   const [blobUrl, setBlobUrl] = useState<string>(null)
   const { get, loading, response } = useApi(

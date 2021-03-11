@@ -7,9 +7,12 @@ import React, {
   useState,
 } from 'react'
 import styled from 'styled-components'
+import { useRecoilState } from 'recoil'
 
 import { MemzResponse, useApi } from '../hooks/useApi'
-import { StoredItem } from '../components'
+import { StoredItem, Dialog } from '../components'
+
+import { dialogVisibility } from '../state/dialogState'
 
 const Container = styled.div`
   display: flex;
@@ -87,9 +90,11 @@ const BottomProbe = styled.div`
 
 export const RepositoryPage = () => {
   const [ref, items] = useInfinityLoader()
+  const [dialog, setDialog] = useRecoilState(dialogVisibility)
 
   return (
     <Container>
+      {dialog === 'Upload' && <Dialog>kekex</Dialog>}
       <ItemsGrid>
         {_.map(items, (item, i) => (
           <StoredItem key={i} item={item} />
