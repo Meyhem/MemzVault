@@ -31,6 +31,7 @@ namespace MemzVault.Web.Features.Repo
         [Route("list")]
         public async Task<ApiResponse<PagedData<StoredItemInfo>>> ListRepository([FromQuery] ApiPagedRequest model)
         {
+            await Task.Delay(1000);
             model.Normalize();
             var (items, total) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), model.Offset, model.Limit);
 

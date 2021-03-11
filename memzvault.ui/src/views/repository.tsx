@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { MemzResponse, useApi } from '../hooks/useApi'
@@ -27,50 +27,58 @@ const Item = styled.div`
 
 const testData = _.times(20, (n) => ({ ItemId: n }))
 
+const pageSize = 20
+
 function useInfinityLoader(): [any, MetaItem[]] {
+  const [drained, setDrained] = useState(false)
   const [currentBatch, setCurrentBatch] = useState(0)
   const [itemsMeta, setItemsMeta] = useState<MetaItem[]>(testData as any)
   const [isOnBottom, setIsOnBottom] = useState(false)
   const bottomProbe = useRef<HTMLElement>(null)
 
-  const { data, get, loading, error } = useApi<
-    MemzResponse<{ items: MetaItem[] }>
-  >({
+  const triggerUpdate = useCallback(() => {
+    const screenHeight = Math.max(
+      document.documentElement.clientHeight || 0,
+      window.innerHeight || 0
+    )
+    const scroll = window.scrollY + screenHeight
+
+    setIsOnBottom(scroll >= bottomProbe.current.offsetTop)
+  }, [])
+
+  useEffect(() => {
+    document.addEventListener('scroll', triggerUpdate)
+    return () => document.removeEventListener('scroll', triggerUpdate)
+  }, [triggerUpdate])
+
+  const { data, get } = useApi<MemzResponse<{ items: MetaItem[] }>>({
     path: '/api/repository/list',
     authenticatedCall: true,
     manual: true,
+    params: {
+      offset: currentBatch * pageSize,
+      limit: pageSize,
+    },
   })
 
   useEffect(() => {
-    if (isOnBottom) {
+    if (isOnBottom && !drained) {
       get()
-      console.log('trigered', isOnBottom)
     }
-  }, [isOnBottom, get])
-
-  useEffect(() => {
-    const scrollHandler = () => {
-      const screenHeight = Math.max(
-        document.documentElement.clientHeight || 0,
-        window.innerHeight || 0
-      )
-      const scroll = window.scrollY + screenHeight
-
-      setIsOnBottom(scroll >= bottomProbe.current.offsetTop)
-      console.log('scroll fired', scroll >= bottomProbe.current.offsetTop)
-    }
-
-    document.addEventListener('scroll', scrollHandler)
-    return () => document.removeEventListener('scroll', scrollHandler)
-  }, [])
+  }, [isOnBottom, drained, get])
 
   useEffect(() => {
     if (!data) return
 
-    // eslint-disable-next-line no-console
-    console.log('finished loading data', data)
+    if (!data.data.items.length) {
+      setDrained(true)
+    }
+
     setItemsMeta((items) => [...items, ...data.data.items])
-  }, [data])
+    setCurrentBatch((b) => b + 1)
+    setIsOnBottom(false)
+    _.defer(triggerUpdate)
+  }, [data, triggerUpdate])
 
   return [bottomProbe, itemsMeta]
 }
