@@ -1,40 +1,34 @@
 import _ from 'lodash'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import styled from 'styled-components'
 
 import { MemzResponse, useApi } from '../hooks/useApi'
-
-interface MetaItem {
-  ItemId: string
-  OriginalFileName: string
-  MimeType: string
-  Name: string
-  Tags: string[]
-}
+import { StoredItem } from '../components'
 
 const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`
+
+const ItemsGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
 `
 
-const Item = styled.div`
-  display: flex;
-  height: 300px;
-  width: 300px;
-  margin: 10px;
-  background: ${({ theme }) => theme.colors.bg2};
-`
-
-const testData = _.times(20, (n) => ({ ItemId: n }))
-
 const pageSize = 20
-
-function useInfinityLoader(): [any, MetaItem[]] {
+function useInfinityLoader(): [MutableRefObject<HTMLDivElement>, MetaItem[]] {
   const [drained, setDrained] = useState(false)
   const [currentBatch, setCurrentBatch] = useState(0)
-  const [itemsMeta, setItemsMeta] = useState<MetaItem[]>(testData as any)
+  const [items, setItems] = useState<MetaItem[]>([])
   const [isOnBottom, setIsOnBottom] = useState(false)
-  const bottomProbe = useRef<HTMLElement>(null)
+  const bottomProbe = useRef<HTMLDivElement>(null)
 
   const triggerUpdate = useCallback(() => {
     const screenHeight = Math.max(
@@ -74,32 +68,34 @@ function useInfinityLoader(): [any, MetaItem[]] {
       setDrained(true)
     }
 
-    setItemsMeta((items) => [...items, ...data.data.items])
+    setItems((items) => [...items, ...data.data.items])
     setCurrentBatch((b) => b + 1)
     setIsOnBottom(false)
     _.defer(triggerUpdate)
   }, [data, triggerUpdate])
 
-  return [bottomProbe, itemsMeta]
+  useEffect(() => {
+    triggerUpdate()
+  }, [triggerUpdate])
+
+  return [bottomProbe, items]
 }
 
-export const RepositoryPage = () => {
-  const [ref, itemsMeta] = useInfinityLoader()
+const BottomProbe = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.bg2};
+`
 
-  useEffect(() => {
-    // setInterval(() => {
-    //   get()
-    // }, 5000)
-  }, [])
+export const RepositoryPage = () => {
+  const [ref, items] = useInfinityLoader()
 
   return (
-    <div>
-      <Container>
-        {_.map(itemsMeta, (item, i) => (
-          <Item key={i}>{i}</Item>
+    <Container>
+      <ItemsGrid>
+        {_.map(items, (item, i) => (
+          <StoredItem key={i} item={item} />
         ))}
-      </Container>
-      <div ref={ref} style={{ border: '1px solid white' }} />
-    </div>
+      </ItemsGrid>
+      <BottomProbe ref={ref} />
+    </Container>
   )
 }

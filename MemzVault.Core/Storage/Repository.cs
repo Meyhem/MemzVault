@@ -40,7 +40,7 @@ namespace MemzVault.Core.Storage
 
             foreach (var id in ids.Skip(offset).Take(limit))
             {
-                var meta = await GetItemMetadata(repo, id, passphrase);
+                var meta = await GetItemMetadata(repo, passphrase, id);
 
                 ret.Add(new StoredItemInfo
                 {
@@ -76,7 +76,7 @@ namespace MemzVault.Core.Storage
             await driver.WriteRepositoryManifest(repo, encoded);
         }
 
-        public async Task SetItemMetadata(string repo, string itemId, string passphrase, StoredItemMetadata meta)
+        public async Task SetItemMetadata(string repo, string passphrase, string itemId,  StoredItemMetadata meta)
         {
             var rawJson = JsonSerializer.Serialize(meta, new() { WriteIndented = false });
             var binaryJson = Encoding.UTF8.GetBytes(rawJson);
@@ -88,7 +88,7 @@ namespace MemzVault.Core.Storage
             await driver.WriteMetadata(repo, itemId, encryptedMetadata);
         }
 
-        public async Task<StoredItemMetadata> GetItemMetadata(string repo, string itemId, string passphrase)
+        public async Task<StoredItemMetadata> GetItemMetadata(string repo, string passphrase, string itemId)
         {
             var encryptedMetadata = await driver.ReadMetadata(repo, itemId);
 
@@ -102,7 +102,7 @@ namespace MemzVault.Core.Storage
             return JsonSerializer.Deserialize<StoredItemMetadata>(rawJson);
         }
 
-        public async Task StoreItem(string repo, string itemId, string passphrase, StoredItemMetadata meta, Stream dataStream)
+        public async Task StoreItem(string repo, string passphrase, string itemId, StoredItemMetadata meta, Stream dataStream)
         {
             var masterKey = await GetRepositoryMasterKey(repo, passphrase);
 
@@ -115,11 +115,11 @@ namespace MemzVault.Core.Storage
             await driver.WriteItem(repo, itemId, encryptedStream);
         }
 
-        public async Task<(Stream, StoredItemMetadata)> RetrieveItem(string repo, string itemId, string passphrase)
+        public async Task<(Stream, StoredItemMetadata)> RetrieveItem(string repo, string passphrase, string itemId)
         {
             var masterKey = await GetRepositoryMasterKey(repo, passphrase);
 
-            var meta = await GetItemMetadata(repo, itemId, passphrase);
+            var meta = await GetItemMetadata(repo, passphrase, itemId);
             var encryptedStream = await driver.ReadItem(repo, itemId);
             var dataStream = crypto.CreateDecryptionStream(encryptedStream, masterKey, Convert.FromBase64String(meta.Base64IV));
 
