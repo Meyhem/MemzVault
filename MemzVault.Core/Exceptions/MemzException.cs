@@ -11,6 +11,7 @@ namespace MemzVault.Core.Exceptions
         RepositoryNotFound,
         MetadataNotFound,
         ItemNotFound,
+        UploadFailed,
 
         // Crypto Ops
         IntegrityCheckFailed,

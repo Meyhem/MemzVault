@@ -10,6 +10,7 @@ export const theme = {
 
     bg1: '#1e1e1e',
     bg2: '#252526',
+    bg3: '#323232',
   },
   fontSizes: ['14px', '16px', '20px', '24px'],
   space: [0, '8px', '16px', '24px', '32px', '40px'],

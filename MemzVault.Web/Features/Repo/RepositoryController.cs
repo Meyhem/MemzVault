@@ -1,8 +1,13 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using MemzVault.Core.Exceptions;
 using MemzVault.Core.Storage;
+using MemzVault.Web.Extensions;
 using MemzVault.Web.Features.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MemzVault.Web.Features.Repo
@@ -32,18 +37,46 @@ namespace MemzVault.Web.Features.Repo
         public async Task<ApiResponse<PagedData<StoredItemInfo>>> ListRepository([FromQuery] ApiPagedRequest model)
         {
             model.Normalize();
-            var (items, total) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), model.Offset, model.Limit);
+            var (items, total) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), model.Offset, model.Limit, null);
 
             return ApiResponse.FromData<PagedData<StoredItemInfo>>(new(items, total));
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("items/{id}")]
         public async Task<IActionResult> GetItem([FromRoute] string id)
         {
             var (stream, meta) = await repo.RetrieveItem(GetRepository(), GetPassphrase(), id);
 
             return File(stream, meta.MimeType, false);
+        }
+
+        [HttpPost]
+        [Route("items")]
+        public async Task<IActionResult> CreateItem(IFormFile[] files)
+        {
+            if (files == null)
+            {
+                throw new MemzException(MemzErrorCode.UploadFailed, "No files to upload");
+            }
+
+            var ids = new List<string>();
+            foreach (var file in files)
+            {
+                var id = Guid.NewGuid().ToString();
+                ids.Add(id);
+
+                await repo.StoreItem(
+                    GetRepository(), 
+                    GetPassphrase(), 
+                    id, 
+                    file.ToStoredItemMetadata(), 
+                    file.OpenReadStream());
+            }
+
+            var (uploadedInfos, _) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, int.MaxValue, info => ids.Contains(info.ItemId));
+            
+            return Ok(ApiResponse.FromData(uploadedInfos));
         }
     }
 }

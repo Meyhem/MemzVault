@@ -5,10 +5,31 @@ import { useApi } from '../hooks/useApi'
 
 const StoredItemContainer = styled.div`
   display: flex;
-  height: 300px;
+  flex-direction: column;
+  justify-content: space-between;
   width: 300px;
   margin: 10px;
   background: ${({ theme }) => theme.colors.bg2};
+`
+
+const ImageContainer = styled.div`
+  height: 300px;
+  display: flex;
+  justify-content: center;
+`
+
+const Image = styled.img`
+  display: block;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  max-width: 100%;
+  max-height: 100%;
+`
+
+const Controls = styled.div`
+  height: 30px;
+  background: ${({ theme }) => theme.colors.bg3};
 `
 
 interface StoredItemProps {
@@ -24,7 +45,7 @@ function isImage(item: MetaItem) {
 export const StoredItem: FC<StoredItemProps> = ({ item }) => {
   const [blobUrl, setBlobUrl] = useState<string>(null)
   const { get, loading, response } = useApi(
-    { path: `/api/repository/${item.itemId}` },
+    { path: `/api/repository/items/${item.itemId}` },
     []
   )
 
@@ -40,7 +61,10 @@ export const StoredItem: FC<StoredItemProps> = ({ item }) => {
   return (
     <StoredItemContainer>
       {loading && 'loding'}
-      {isImage(item) && blobUrl && <img src={blobUrl} />}
+      <ImageContainer>
+        {isImage(item) && blobUrl && <Image src={blobUrl} />}
+      </ImageContainer>
+      <Controls>ctrl</Controls>
     </StoredItemContainer>
   )
 }

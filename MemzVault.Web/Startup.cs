@@ -9,6 +9,8 @@ using MemzVault.Web.Extensions;
 using MemzVault.Core.Config;
 using MemzVault.Core.Extensions;
 using System.IdentityModel.Tokens.Jwt;
+using MemzVault.Web.Features.Common;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace MemzVault.Web
 {
@@ -40,11 +42,18 @@ namespace MemzVault.Web
                 jwt.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(jwtSigningKey);
             });
 
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = int.MaxValue; // if don't set default value is: 128 MB
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+
             services.AddAuthorization();
             services.AddLogging();
 
             services.AddMemz();
-            services.AddControllers();
+            services.AddControllers(c => c.Filters.Add(new ExceptionInterceptor()));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

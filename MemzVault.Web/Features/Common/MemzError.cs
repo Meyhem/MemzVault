@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 using MemzVault.Core.Exceptions;
 
 namespace MemzVault.Web.Features.Common
@@ -19,6 +20,17 @@ namespace MemzVault.Web.Features.Common
                 ErrorMessage = ex.Message,
                 Stack = ex.StackTrace,
                 GenericDescription = ex.ErrorCode.ToString()
+            };
+        }
+
+        public static MemzError FromException(Exception ex)
+        {
+            return new()
+            {
+                ErrorCode = MemzErrorCode.Unknown,
+                ErrorMessage = ex.Message,
+                Stack = ex.StackTrace,
+                GenericDescription = MemzErrorCode.Unknown.ToString()
             };
         }
     }

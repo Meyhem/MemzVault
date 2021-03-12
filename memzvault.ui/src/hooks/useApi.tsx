@@ -7,6 +7,8 @@ import _ from 'lodash'
 import { history } from '../common/history'
 import { config } from '../common/config'
 import { hasValidToken, tokenState } from '../state/tokenState'
+import { useNotifications, Notification } from './useNotifications'
+import { useHistory } from 'react-router'
 
 export interface MemzResponse<T> {
   data: T
@@ -31,8 +33,10 @@ export function useApi<T>(cfg: CallConfig, deps?: Array<any>): UseFetch<T> {
   const url = new URL(cfg.path, config.apiUrl)
   url.search = stringify(cfg.params)
 
+  const h = useHistory()
   const validToken = useRecoilValue(hasValidToken)
   const token = useRecoilValue(tokenState)
+  const { addToast } = useNotifications()
 
   useEffect(() => {
     if (cfg.authenticatedCall && !validToken) {
@@ -56,6 +60,14 @@ export function useApi<T>(cfg: CallConfig, deps?: Array<any>): UseFetch<T> {
       cache: 'no-cache',
       cachePolicy: CachePolicies.NO_CACHE,
       headers: { ...additionalHeaders },
+      interceptors: {
+        response: ({ response }) => {
+          if (response.status === 401) {
+            h.push('/')
+          }
+          return Promise.resolve(response)
+        },
+      },
     },
     deps
   )

@@ -33,26 +33,35 @@ namespace MemzVault.Core.Storage
             await SetRepositoryManifest(repo, manifest);
         }
 
-        public async Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, string passphrase, int offset, int limit)
+        public async Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, 
+            string passphrase, 
+            int offset, 
+            int limit, 
+            Func<StoredItemInfo, bool> predicate)
         {
             var ids = await driver.ListRepositoryItemIds(repo);
-            List<StoredItemInfo> ret = new();
+            List<StoredItemInfo> items = new();
 
-            foreach (var id in ids.Skip(offset).Take(limit))
+            foreach (var id in ids)
             {
                 var meta = await GetItemMetadata(repo, passphrase, id);
-
-                ret.Add(new StoredItemInfo
+                var info = new StoredItemInfo
                 {
                     ItemId = id,
                     MimeType = meta.MimeType,
                     Name = meta.Name,
                     OriginalFileName = meta.OriginalFilename,
                     Tags = meta.Tags
-                });
+                };
+
+                if (predicate != null && !predicate(info)) continue;
+
+                items.Add(info);
             }
 
-            return (ret, ids.Count());
+            var ret = items.Skip(offset).Take(limit);
+
+            return (ret, items.Count());
         }
 
         public async Task<bool> RepositoryExists(string repo)
@@ -111,7 +120,7 @@ namespace MemzVault.Core.Storage
 
             var encryptedStream = crypto.CreateEncryptionStream(dataStream, masterKey, iv);
 
-            await SetItemMetadata(repo, itemId, passphrase, meta);
+            await SetItemMetadata(repo, passphrase, itemId, meta);
             await driver.WriteItem(repo, itemId, encryptedStream);
         }
 

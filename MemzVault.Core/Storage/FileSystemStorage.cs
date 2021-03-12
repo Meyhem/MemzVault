@@ -61,8 +61,10 @@ namespace MemzVault.Core.Storage
             await AssertRepositoryExists(repo);
 
             var manifestFname = GetRepositoryManifestPath(repo);
-
-            return await File.ReadAllBytesAsync(manifestFname);
+            using var manifest = File.Open(manifestFname, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var reader = new StreamReader(manifest);
+            
+            return ReadAllBytes(manifestFname);
         }
 
         public async Task WriteRepositoryManifest(string repo, byte[] manifest)
@@ -90,7 +92,7 @@ namespace MemzVault.Core.Storage
 
             AssertMetadataExists(repo, itemId);
 
-            return await File.ReadAllBytesAsync(metaPath);
+            return await Task.FromResult(ReadAllBytes(metaPath));
         }
 
         public async Task WriteItem(string repo, string itemId, Stream encryptedStream)
@@ -111,8 +113,17 @@ namespace MemzVault.Core.Storage
             AssertItemExists(repo, itemId);
 
             var itemPath = GetItemPath(repo, itemId);
+            
+            return await Task.FromResult(File.Open(itemPath, FileMode.Open, FileAccess.Read, FileShare.Read));
+        }
 
-            return await Task.FromResult(File.OpenRead(itemPath));
+        private byte[] ReadAllBytes(string file)
+        {
+            using var fileStream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var buf = new byte[fileStream.Length];
+            fileStream.Read(buf);
+
+            return buf;
         }
 
         private string GetItemPath(string repo, string itemId)
