@@ -40,7 +40,7 @@ const StyledSelect = styled(RCCreatableSelect)`
   }
 
   .react-select__indicator-separator {
-    background-color: ${({ theme }) => theme.colors.border2};
+    display: none;
   }
 `
 

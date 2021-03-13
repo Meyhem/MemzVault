@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using MemzVault.Core.Exceptions;
 using MemzVault.Core.Storage;
@@ -51,6 +54,15 @@ namespace MemzVault.Web.Features.Repo
             return File(stream, meta.MimeType, false);
         }
 
+        [HttpDelete]
+        [Route("items/{id}")]
+        public async Task<IActionResult> DeleteItem([FromRoute] string id)
+        {
+            await repo.DeleteItem(GetRepository(), GetPassphrase(), id);
+            
+            return Ok();
+        }
+
         [HttpPost]
         [Route("items")]
         public async Task<IActionResult> CreateItem(IFormFile[] files)
@@ -77,6 +89,54 @@ namespace MemzVault.Web.Features.Repo
             var (uploadedInfos, _) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, int.MaxValue, info => ids.Contains(info.ItemId));
             
             return Ok(ApiResponse.FromData(uploadedInfos));
+        }
+
+        [HttpPost]
+        [Route("items/remote-download")]
+        public async Task<IActionResult> RemoteDownloadItem([FromBody]RemoteDownloadRequest model)
+        {
+            HttpClient client = new();
+            client.DefaultRequestHeaders.UserAgent.Clear();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36");
+
+            using var resp = await client.GetAsync(model.Url);
+            if (!resp.IsSuccessStatusCode)
+            {
+                throw new MemzException(MemzErrorCode.DownloadFailed, $"Cannot download image from {model.Url}");
+            }
+
+            var mime = resp.Content.Headers.ContentType.MediaType ?? string.Empty;
+            
+            if (!MimeMappings.IsSupportedMime(mime))
+            {
+                throw new MemzException(MemzErrorCode.InvalidFileType, $"Invalid file type {mime}");
+            }
+
+            var stream = await resp.Content.ReadAsStreamAsync();
+
+            var id = Guid.NewGuid().ToString();
+
+            var name = Path.ChangeExtension(id, MimeMappings.MimeToFileExtension(mime));
+            var meta = new StoredItemMetadata(0x01, name, mime, name, Array.Empty<string>(), null);
+
+            await repo.StoreItem(GetRepository(), GetPassphrase(), id, meta, stream);
+
+            var (info, _) = (await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, 1, inf => inf.ItemId == id));
+            
+            return Ok(ApiResponse.FromData(info.FirstOrDefault()));
+        }
+
+
+        [HttpPut]
+        [Route("items/{id}/meta")]
+        public async Task<IActionResult> UpdateMeta([FromRoute]string id, [FromBody]StoredItemInfo meta)
+        {
+            var stored = await repo.GetItemMetadata(GetRepository(), GetPassphrase(), id);
+
+            stored = stored with { Tags = meta.Tags };
+            await repo.SetItemMetadata(GetRepository(), GetPassphrase(), id, stored);
+
+            return Ok();
         }
     }
 }

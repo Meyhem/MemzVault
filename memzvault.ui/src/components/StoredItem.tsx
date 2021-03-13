@@ -4,8 +4,9 @@ import styled from 'styled-components'
 import { OptionTypeBase } from 'react-select'
 
 import { isImage } from '../common/util'
-import { useApi } from '../hooks/useApi'
+import { MemzResponse, useApi } from '../hooks/useApi'
 import { CreatableSelect } from './CreatableSelect'
+import { useNotifications } from '../hooks/useNotifications'
 
 const StoredItemContainer = styled.div`
   display: flex;
@@ -50,6 +51,7 @@ const Controls = styled.div`
 
 const ControlItem = styled.div`
   margin-left: 5px;
+  word-break: break-all;
 `
 
 const Tags = styled.div`
@@ -68,6 +70,8 @@ interface StoredItemProps {
   item: MetaItem
   allTags: string[]
   onDetail(data: { blobUrl: string; metaItem: MetaItem }): void
+  onDeleted(item: MetaItem): void
+  onUpdated(item: MetaItem): void
 }
 
 const tagsToOptions = (tags: string[]) =>
@@ -77,26 +81,64 @@ export const StoredItem: FC<StoredItemProps> = ({
   item,
   allTags,
   onDetail,
+  onDeleted,
+  onUpdated,
 }) => {
   const [blobUrl, setBlobUrl] = useState<string>(null)
   const [tags, setTags] = useState<string[]>([...item.tags])
+  const { notifyHttp } = useNotifications()
 
   const { get, loading, response } = useApi({
     path: `/api/repository/items/${item.itemId}`,
   })
 
-  const { post: postMeta } = useApi({
-    method: 'POST',
+  const {
+    delete: deleteItem,
+    request: deleteRequest,
+    response: deleteResponse,
+  } = useApi<MemzResponse<any>>({
+    method: 'DELETE',
+    path: `/api/repository/items/${item.itemId}`,
+  })
+
+  const { put: putMeta, request: metaRequest, response: metaResponse } = useApi<
+    MemzResponse<any>
+  >({
+    method: 'PUT',
     path: `/api/repository/items/${item.itemId}/meta`,
   })
 
-  const onItemClick = useCallback(() => {
+  const handleDelete = useCallback(async () => {
+    if (!confirm('Are you sure to delete ?')) return
+
+    await deleteItem()
+    if (deleteResponse.ok) onDeleted(item)
+
+    notifyHttp(deleteRequest, deleteResponse, 'Deleted...')
+  }, [notifyHttp, deleteItem, deleteRequest, deleteResponse, item, onDeleted])
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedPutMeta = useCallback(
+    _.debounce(async (tags: string[]) => {
+      await putMeta({ tags })
+      onUpdated({ ...item, tags })
+      notifyHttp(metaRequest, metaResponse, 'Tags updated')
+    }, 1000),
+    []
+  )
+
+  const handleItemClick = useCallback(() => {
     onDetail({ blobUrl, metaItem: item })
   }, [blobUrl, item, onDetail])
 
-  const handleTagsChange = useCallback((newVal: OptionTypeBase) => {
-    setTags(_.map(newVal, 'value'))
-  }, [])
+  const handleTagsChange = useCallback(
+    async (newVal: OptionTypeBase) => {
+      const arr = _.map(newVal, 'value')
+      setTags(arr)
+      debouncedPutMeta(arr)
+    },
+    [debouncedPutMeta]
+  )
 
   useEffect(() => {
     const run = async () => {
@@ -118,10 +160,10 @@ export const StoredItem: FC<StoredItemProps> = ({
       <Controls>
         <ControlItem>{item.name}</ControlItem>
         <ControlItem>
-          <ControlIcon>✖</ControlIcon>
+          <ControlIcon onClick={handleDelete}>✖</ControlIcon>
         </ControlItem>
       </Controls>
-      <ImageContainer onClick={onItemClick}>
+      <ImageContainer onClick={handleItemClick}>
         {isImage(item) && blobUrl && <Image src={blobUrl} />}
       </ImageContainer>
       <ColntrolsContainer>

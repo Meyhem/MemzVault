@@ -8,6 +8,7 @@ namespace MemzVault.Core.Storage
     public interface IRepository
     {
         Task CreateRepository(string repo, string passphrase);
+        Task DeleteItem(string repo, string passphrase, string itemId);
         Task<StoredItemMetadata> GetItemMetadata(string repo, string passphrase, string itemId);
         Task<RepositoryManifest> GetRepositoryManifest(string repo);
         Task<byte[]> GetRepositoryMasterKey(string repo, string passphrase);

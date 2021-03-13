@@ -78,7 +78,16 @@ export const RepositoryPage = () => {
     },
     [setDialog, setItems]
   )
-  getUniqueTagsByFrequency(items)
+
+  const handleItemDelete = (item: MetaItem) => {
+    setItems(_.reject(items, (it) => it.itemId === item.itemId))
+  }
+  const handleItemUpdate = (item: MetaItem) => {
+    const idx = _.findIndex(items, (it) => it.itemId == item.itemId)
+    const updatedItems = [...items.slice(0, idx), item, ...items.slice(idx + 1)]
+    setItems(updatedItems)
+  }
+
   return (
     <Container>
       <DialogUpload onUploadFinished={onUploadFinished} />
@@ -88,6 +97,8 @@ export const RepositoryPage = () => {
           <StoredItem
             key={item.itemId}
             item={item}
+            onDeleted={handleItemDelete}
+            onUpdated={handleItemUpdate}
             onDetail={showDetailDialog}
             allTags={tagList}
           />

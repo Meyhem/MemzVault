@@ -135,6 +135,13 @@ namespace MemzVault.Core.Storage
             return (dataStream, meta);
         }
 
+        public async Task DeleteItem(string repo, string passphrase, string itemId)
+        {
+            await GetRepositoryMasterKey(repo, passphrase);
+
+            await driver.DeleteItem(repo, itemId);
+        }
+
         public async Task<byte[]> GetRepositoryMasterKey(string repo, string passphrase)
         {
             var manifest = await GetRepositoryManifest(repo);

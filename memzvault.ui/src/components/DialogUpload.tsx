@@ -21,7 +21,7 @@ const DropZoneContainer = styled.div`
 
 export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
   const [dialog] = useRecoilState(dialogVisibility)
-  const { addHttpToast } = useNotifications()
+  const { notifyHttp, notify } = useNotifications()
 
   const { post, loading, request, response } = useApi<MemzResponse<MetaItem[]>>(
     {
@@ -30,15 +30,14 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
     }
   )
 
-  const pasteHandler = useCallback((e: ClipboardEvent) => {
-    if (!_.isEmpty(e.clipboardData.files)) {
-      console.log(e.clipboardData.files)
-      uploadFiles(e.clipboardData.files)
-    }
-
-    console.log('clip getData()', e.clipboardData.getData('text/plain'))
-    console.log('clip getData()', e.clipboardData.getData('text/uri-list'))
-  }, [])
+  const {
+    post: uploadPost,
+    request: uploadRequest,
+    response: uploadResponse,
+  } = useApi<MemzResponse<MetaItem>>({
+    method: 'POST',
+    path: `/api/repository/items/remote-download`,
+  })
 
   const uploadFiles = useCallback(
     async (acceptedFiles) => {
@@ -48,13 +47,47 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
       })
       await post(formData)
 
-      addHttpToast(request, response, 'Image/s uploaded')
+      notifyHttp(request, response, 'Image/s uploaded')
 
       if (response.ok) {
         onUploadFinished(response.data.data)
       }
     },
-    [post, addHttpToast, request, response, onUploadFinished]
+    [post, notifyHttp, request, response, onUploadFinished]
+  )
+
+  const pasteHandler = useCallback(
+    async (e: ClipboardEvent) => {
+      if (!_.isEmpty(e.clipboardData.files)) {
+        uploadFiles(e.clipboardData.files)
+        return
+      }
+
+      const str = e.clipboardData.getData('text/plain')
+      try {
+        const url = new URL(str)
+        notify('Paste', 'Downloading URL', 'success')
+        await uploadPost({ url })
+        notifyHttp(uploadRequest, uploadResponse, 'Downloaded!')
+        if (uploadResponse.ok) {
+          const newMeta = uploadResponse.data?.data
+          if (newMeta) {
+            onUploadFinished([newMeta])
+          }
+        }
+      } catch (e) {
+        notify('Paste', 'Nothing reasonable in clipboard', 'warning')
+      }
+    },
+    [
+      notify,
+      notifyHttp,
+      onUploadFinished,
+      uploadFiles,
+      uploadPost,
+      uploadRequest,
+      uploadResponse,
+    ]
   )
 
   useEffect(() => {

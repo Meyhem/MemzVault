@@ -13,7 +13,7 @@ export function App() {
   return (
     <RecoilRoot>
       <ThemeProvider theme={theme}>
-        <ToastProvider autoDismiss={true} autoDismissTimeout={3000}>
+        <ToastProvider autoDismiss={true} autoDismissTimeout={1500}>
           <GlobalStyle />
           <Router history={history}>
             <Switch>

@@ -29,7 +29,7 @@ const SubmitButton = styled(Button)`
 export const LoginPage = () => {
   const [, setToken] = usePersistedState(tokenState)
   const { t } = useTranslation()
-  const { addHttpToast } = useNotifications()
+  const { notifyHttp } = useNotifications()
 
   const { post, request, response, loading } = useApi<MemzResponse<string>>({
     path: '/api/auth/token',
@@ -43,7 +43,7 @@ export const LoginPage = () => {
           onSubmit={async ({ repository, passphrase }) => {
             await post({ repository, passphrase })
 
-            addHttpToast(request, response, 'Logged in')
+            notifyHttp(request, response, 'Logged in')
 
             if (response.status === 200) {
               setToken(response.data.data)

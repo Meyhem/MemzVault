@@ -117,6 +117,20 @@ namespace MemzVault.Core.Storage
             return await Task.FromResult(File.Open(itemPath, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
 
+        public async Task DeleteItem(string repo, string itemId)
+        {
+            repo = NormalizeRepositoryName(repo);
+            AssertItemExists(repo, itemId);
+
+            var itemPath = GetItemPath(repo, itemId);
+            var metaPath = GetMetadataPath(repo, itemId);
+
+            File.Delete(itemPath);
+            File.Delete(metaPath);
+
+            await Task.CompletedTask;
+        }
+
         private byte[] ReadAllBytes(string file)
         {
             using var fileStream = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read);

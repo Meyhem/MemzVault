@@ -23,7 +23,7 @@ export const DialogDetail: FC<DialogDetailProps> = ({ blobUrl, metaItem }) => {
     dialog === 'Detail' && (
       <Dialog>
         <TransformWrapper
-          wheel={{ step: 5 }}
+          wheel={{ step: 10 }}
           defaultPositionY={0}
           options={{
             minScale: 0.1,

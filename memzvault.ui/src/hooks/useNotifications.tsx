@@ -1,12 +1,15 @@
 import _ from 'lodash'
 import { FC, ReactNode, useCallback } from 'react'
-import { useToasts } from 'react-toast-notifications'
+import { AppearanceTypes, useToasts } from 'react-toast-notifications'
 import { Req, Res } from 'use-http'
 
 import { Flex } from '../components'
 import { MemzResponse } from './useApi'
 
-export const Notification: FC<{ title?: string }> = ({ title, children }) => {
+export const Notification: FC<{ title?: ReactNode }> = ({
+  title,
+  children,
+}) => {
   return (
     <Flex flexDirection="column">
       <b>{title}</b>
@@ -16,11 +19,11 @@ export const Notification: FC<{ title?: string }> = ({ title, children }) => {
 }
 
 export function useNotifications() {
-  const toast = useToasts()
+  const { addToast, ...rest } = useToasts()
 
-  const addHttpToast = useCallback(
+  const notifyHttp = useCallback(
     (req: Req, res: Res<MemzResponse<any>>, successMessage?: ReactNode) =>
-      toast.addToast(
+      addToast(
         <Notification
           title={
             !req.error && res.ok
@@ -34,11 +37,26 @@ export function useNotifications() {
         </Notification>,
         { appearance: !req.error && res.ok ? 'success' : 'error' }
       ),
-    [toast]
+    [addToast]
+  )
+
+  const notify = useCallback(
+    (
+      title: ReactNode,
+      message: ReactNode,
+      appearance: AppearanceTypes = 'info'
+    ) => {
+      addToast(<Notification title={title}>{message}</Notification>, {
+        appearance,
+      })
+    },
+    [addToast]
   )
 
   return {
-    ...toast,
-    addHttpToast,
+    ...rest,
+    addToast,
+    notify,
+    notifyHttp,
   }
 }
