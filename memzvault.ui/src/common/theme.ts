@@ -7,6 +7,7 @@ export const theme = {
     text2: '#6060ff',
 
     border1: '#DBFFFF',
+    border2: '#868686',
 
     bg1: '#1e1e1e',
     bg2: '#252526',

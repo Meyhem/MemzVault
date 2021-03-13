@@ -14,6 +14,7 @@ const Overlay = styled.div`
   background: rgba(255, 255, 255, 0.2);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  z-index: 100;
 `
 
 const DialogContainer = styled.div`
@@ -26,6 +27,9 @@ const DialogContainer = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.bg2};
   border-radius: 4px;
   background: ${({ theme }) => theme.colors.bg1};
+  max-height: calc(100vh - 100px);
+  max-width: calc(100vw - 100px);
+  min-width: calc(50vw);
 `
 
 const Cross = styled.div`

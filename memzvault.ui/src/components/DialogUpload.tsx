@@ -2,12 +2,12 @@ import { useRecoilState } from 'recoil'
 import { FC, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import _ from 'lodash'
+import styled from 'styled-components'
 
 import { dialogVisibility } from '../state/dialogState'
 import { Dialog } from './Dialog'
 import { MemzResponse, useApi } from '../hooks/useApi'
 import { useNotifications } from '../hooks/useNotifications'
-import styled from 'styled-components'
 
 interface UploadDialogProps {
   onUploadFinished(items?: MetaItem[]): void

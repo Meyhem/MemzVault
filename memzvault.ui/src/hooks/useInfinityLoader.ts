@@ -28,7 +28,6 @@ export function useInfinityLoader() {
   const { data, get } = useApi<MemzResponse<{ items: MetaItem[] }>>({
     path: '/api/repository/list',
     authenticatedCall: true,
-    manual: true,
     params: {
       offset: currentBatch * pageSize,
       limit: pageSize,

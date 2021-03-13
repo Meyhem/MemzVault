@@ -3,12 +3,11 @@ import { stringify } from 'querystring'
 import { useRecoilValue } from 'recoil'
 import { useEffect } from 'react'
 import _ from 'lodash'
+import { useHistory } from 'react-router'
 
 import { history } from '../common/history'
 import { config } from '../common/config'
 import { hasValidToken, tokenState } from '../state/tokenState'
-import { useNotifications, Notification } from './useNotifications'
-import { useHistory } from 'react-router'
 
 export interface MemzResponse<T> {
   data: T
@@ -25,7 +24,6 @@ interface CallConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
   params?: any
   body?: any
-  manual?: boolean
   authenticatedCall?: boolean
 }
 
@@ -36,7 +34,6 @@ export function useApi<T>(cfg: CallConfig, deps?: Array<any>): UseFetch<T> {
   const h = useHistory()
   const validToken = useRecoilValue(hasValidToken)
   const token = useRecoilValue(tokenState)
-  const { addToast } = useNotifications()
 
   useEffect(() => {
     if (cfg.authenticatedCall && !validToken) {

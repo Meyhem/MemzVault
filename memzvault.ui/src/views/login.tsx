@@ -12,6 +12,7 @@ import {
   Flex,
 } from '../components'
 import { useApi, MemzResponse } from '../hooks/useApi'
+import { useNotifications } from '../hooks/useNotifications'
 import { usePersistedState } from '../hooks/usePersistedState'
 import { tokenState } from '../state/tokenState'
 
@@ -28,8 +29,9 @@ const SubmitButton = styled(Button)`
 export const LoginPage = () => {
   const [, setToken] = usePersistedState(tokenState)
   const { t } = useTranslation()
+  const { addHttpToast } = useNotifications()
 
-  const { post, response, loading } = useApi<MemzResponse<string>>({
+  const { post, request, response, loading } = useApi<MemzResponse<string>>({
     path: '/api/auth/token',
   })
 
@@ -40,6 +42,8 @@ export const LoginPage = () => {
           initialValues={{ repository: 'repo1', passphrase: 'keks' }}
           onSubmit={async ({ repository, passphrase }) => {
             await post({ repository, passphrase })
+
+            addHttpToast(request, response, 'Logged in')
 
             if (response.status === 200) {
               setToken(response.data.data)

@@ -1,6 +1,6 @@
 import { atom, DefaultValue, selector } from 'recoil'
 
-type Dialogs = 'Upload'
+type Dialogs = 'Upload' | 'Detail'
 
 export interface DialogState {
   open?: Dialogs
@@ -8,7 +8,7 @@ export interface DialogState {
 
 export const dialogState = atom<DialogState>({
   key: 'dialogState',
-  default: { open: 'Upload' },
+  default: { open: null },
 })
 
 export const dialogVisibility = selector<Dialogs>({
@@ -17,7 +17,7 @@ export const dialogVisibility = selector<Dialogs>({
   set: ({ set, get }, value) => {
     set(dialogState, {
       ...get(dialogState),
-      open: value instanceof DefaultValue ? 'Upload' : value,
+      open: value instanceof DefaultValue ? null : value,
     })
   },
 })

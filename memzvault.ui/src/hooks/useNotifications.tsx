@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { FC, ReactNode, useCallback } from 'react'
 import { useToasts } from 'react-toast-notifications'
 import { Req, Res } from 'use-http'
@@ -24,12 +25,12 @@ export function useNotifications() {
           title={
             !req.error && res.ok
               ? 'Ok'
-              : req.error || (res.data as any)?.error?.errorCode
+              : (res.data as any)?.error?.errorCode || 'Error'
           }
         >
           {!req.error && res.ok
             ? successMessage || 'Done'
-            : req.error || (res.data as any)?.error?.errorMessage}
+            : _.toString(req.error) || (res.data as any)?.error?.errorMessage}
         </Notification>,
         { appearance: !req.error && res.ok ? 'success' : 'error' }
       ),
