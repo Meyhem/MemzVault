@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { OptionTypeBase } from 'react-select'
 import { useTranslation } from 'react-i18next'
 
-import { isImage } from '../common/util'
+import { isImage, isVideo } from '../common/util'
 import { MemzResponse, useApi } from '../hooks/useApi'
 import { CreatableSelect } from './CreatableSelect'
 import { useNotifications } from '../hooks/useNotifications'
@@ -28,6 +28,15 @@ const ImageContainer = styled.div`
 `
 
 const Image = styled.img`
+  display: block;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  max-width: 100%;
+  max-height: 100%;
+`
+
+const Video = styled.video`
   display: block;
   height: auto;
   object-fit: contain;
@@ -175,6 +184,11 @@ export const StoredItem: FC<StoredItemProps> = ({
       </Controls>
       <ImageContainer onClick={handleItemClick}>
         {isImage(item) && blobUrl && <Image src={blobUrl} />}
+        {isVideo(item) && blobUrl && (
+          <Video preload="metadata">
+            <source src={blobUrl} type={item.mimeType} />
+          </Video>
+        )}
       </ImageContainer>
       <ColntrolsContainer>
         <Controls>

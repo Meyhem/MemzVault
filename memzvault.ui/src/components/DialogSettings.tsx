@@ -23,7 +23,7 @@ const Container = styled.div`
 const SettingsItem = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: 150px;
+  width: 50%;
 `
 
 const Label = styled.span`
@@ -68,10 +68,28 @@ export const DialogSettings = () => {
     value: lang,
   }))
 
+  const fontOptions = _.map(['Source Code Pro', 'UnifrakturMaguntia'], (f) => ({
+    value: f,
+    label: <span style={{ fontFamily: f }}>{f}</span>,
+  }))
+
   return (
     dialog === 'Settings' && (
       <Dialog>
         <Container>
+          <SettingsItem>
+            <Label>Font</Label>
+            <Select
+              value={{
+                label: settings[repoName]?.font,
+                value: settings[repoName]?.font,
+              }}
+              options={fontOptions}
+              onChange={(v) => {
+                updateSettings({ font: v.value })
+              }}
+            />
+          </SettingsItem>
           <SettingsItem>
             <Label>Language</Label>
             <Select

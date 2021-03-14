@@ -6,6 +6,7 @@ export interface Settings {
 
 export interface RepositorySettings {
   language: string
+  font: string
 }
 
 export const settingsState = persistedAtom<Settings>({

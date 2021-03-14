@@ -3,7 +3,7 @@ import { useRecoilState } from 'recoil'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 import styled from 'styled-components'
 
-import { isImage } from '../common/util'
+import { isImage, isVideo } from '../common/util'
 import { dialogVisibility } from '../state/dialogState'
 import { Dialog } from './Dialog'
 
@@ -13,6 +13,11 @@ interface DialogDetailProps {
 }
 
 const Image = styled.img`
+  max-width: 100%;
+  min-width: 40vw;
+`
+
+const Video = styled.video`
   max-width: 100%;
   min-width: 40vw;
 `
@@ -34,6 +39,11 @@ export const DialogDetail: FC<DialogDetailProps> = ({ blobUrl, metaItem }) => {
         >
           <TransformComponent>
             {isImage(metaItem) && <Image src={blobUrl} />}
+            {isVideo(metaItem) && (
+              <Video preload="metadata" controls={true}>
+                <source src={blobUrl} type={metaItem.mimeType} />
+              </Video>
+            )}
           </TransformComponent>
         </TransformWrapper>
       </Dialog>

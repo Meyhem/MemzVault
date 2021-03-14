@@ -1,6 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 
-export const theme = {
+export const defaultTheme = {
   colors: {
     primary: 'blue',
     text1: '#DBFFFF',
@@ -15,16 +15,17 @@ export const theme = {
   },
   fontSizes: ['14px', '16px', '20px', '24px'],
   space: [0, '8px', '16px', '24px', '32px', '40px'],
+  font: 'Source Code Pro',
 }
 
-export type Theme = typeof theme
+export type Theme = typeof defaultTheme
 
 export const GlobalStyle = createGlobalStyle`
   body, html, #root {
     display: flex;
     background: ${({ theme }) => theme.colors.bg1};
     color: ${({ theme }) => theme.colors.text1};
-    font-family: 'Source Code Pro', monospace;
+    font-family: ${({ theme }) => theme.font}, monospace;
     font-size: ${({ theme }) => theme.fontSizes[1]};
     height: 100%;
     width: 100%;
@@ -37,6 +38,6 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   input, button {
-    font-family: 'Source Code Pro', monospace;
+    font-family: ${({ theme }) => theme.font}, monospace;
   }
 `
