@@ -1,9 +1,22 @@
 {
+  "strings": {
+    "ImagesUploaded": "Image/s sneeded",
+    "DownloadingUrl": "Stealing meme",
+    "Uploading": "Upsneeded",
+    "Downloaded": "Downsneeded",
+    "BadClipdoard": "There is only tranny midget porn in your clipboard, I refuse to upload that...",
+    "ConfirmDelete": "Reelly yeet this meem ?",
+    "TagsUpdated": "Tags sneeded",
+    "ItemDeleted": "BTFO'd",
+    "SelectTags": "Select tags...",
+    "Loading": "Sneeding..."
+  },
+
   "validation": {
-    "Required": "Value or BTFO"
+    "Required": "Value or fuck off"
   },
   "memzErrorCode": {
-    "RepositoryNotFound": "Repo not found, fuck off back to reddit",
-    "InvalidPassphrase": "No, no, no... You didn't say the magic word"
+    "RepositoryNotFound": "Wrong repository, newfag",
+    "InvalidPassphrase": "NO, NO, NO. You didn't say the magic word"
   }
 }

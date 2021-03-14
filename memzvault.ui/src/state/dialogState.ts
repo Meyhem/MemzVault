@@ -1,6 +1,6 @@
 import { atom, DefaultValue, selector } from 'recoil'
 
-type Dialogs = 'Upload' | 'Detail'
+type Dialogs = 'Upload' | 'Detail' | 'Settings'
 
 export interface DialogState {
   open?: Dialogs

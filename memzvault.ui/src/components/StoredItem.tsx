@@ -1,7 +1,8 @@
 import _ from 'lodash'
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { OptionTypeBase } from 'react-select'
+import { useTranslation } from 'react-i18next'
 
 import { isImage } from '../common/util'
 import { MemzResponse, useApi } from '../hooks/useApi'
@@ -87,6 +88,7 @@ export const StoredItem: FC<StoredItemProps> = ({
   const [blobUrl, setBlobUrl] = useState<string>(null)
   const [tags, setTags] = useState<string[]>([...item.tags])
   const { notifyHttp } = useNotifications()
+  const { t } = useTranslation()
 
   const { get, loading, response } = useApi({
     path: `/api/repository/items/${item.itemId}`,
@@ -109,20 +111,28 @@ export const StoredItem: FC<StoredItemProps> = ({
   })
 
   const handleDelete = useCallback(async () => {
-    if (!confirm('Are you sure to delete ?')) return
+    if (!confirm(t('strings:ConfirmDelete'))) return
 
     await deleteItem()
     if (deleteResponse.ok) onDeleted(item)
 
-    notifyHttp(deleteRequest, deleteResponse, 'Deleted...')
-  }, [notifyHttp, deleteItem, deleteRequest, deleteResponse, item, onDeleted])
+    notifyHttp(deleteRequest, deleteResponse, t('strings:ItemDeleted'))
+  }, [
+    t,
+    deleteItem,
+    deleteResponse,
+    onDeleted,
+    item,
+    notifyHttp,
+    deleteRequest,
+  ])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedPutMeta = useCallback(
     _.debounce(async (tags: string[]) => {
       await putMeta({ tags })
       onUpdated({ ...item, tags })
-      notifyHttp(metaRequest, metaResponse, 'Tags updated')
+      notifyHttp(metaRequest, metaResponse, t('strings:TagsUpdated'))
     }, 1000),
     []
   )
@@ -156,7 +166,7 @@ export const StoredItem: FC<StoredItemProps> = ({
 
   return (
     <StoredItemContainer>
-      {loading && 'loding'}
+      {loading && t('strings:Loading')}
       <Controls>
         <ControlItem>{item.name}</ControlItem>
         <ControlItem>
@@ -170,7 +180,7 @@ export const StoredItem: FC<StoredItemProps> = ({
         <Controls>
           <Tags>
             <CreatableSelect
-              placeholder="Select tags..."
+              placeholder={t('strings:SelectTags')}
               value={tagsToOptions(tags)}
               closeMenuOnSelect={false}
               options={tagOptions}

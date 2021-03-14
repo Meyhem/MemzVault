@@ -4,14 +4,19 @@ import { useRecoilState } from 'recoil'
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { useInfinityLoader } from '../hooks/useInfinityLoader'
+import { useGlobalHook } from '../hooks/useGlobalHook'
 import {
   StoredItem,
   DialogUpload,
   FixedControls,
   DialogDetail,
+  DialogSettings,
 } from '../components'
 
 import { dialogVisibility } from '../state/dialogState'
+import { tokenState } from '../state/tokenState'
+import { useHistory } from 'react-router'
+import { usePersistedState } from '../hooks/usePersistedState'
 
 const Container = styled.div`
   display: flex;
@@ -53,8 +58,12 @@ function getUniqueTagsByFrequency(items: MetaItem[]) {
 }
 
 export const RepositoryPage = () => {
+  useGlobalHook()
   const { bottomProbe, items, setItems } = useInfinityLoader()
   const [, setDialog] = useRecoilState(dialogVisibility)
+  const [, setToken] = usePersistedState(tokenState)
+  const history = useHistory()
+
   const [detailData, setDetailData] = useState<{
     blobUrl: string
     metaItem: MetaItem
@@ -63,6 +72,13 @@ export const RepositoryPage = () => {
   const tagList = useMemo(() => getUniqueTagsByFrequency(items), [items])
 
   const showAddDialog = useCallback(() => setDialog('Upload'), [setDialog])
+  const showSettingsDialog = useCallback(() => setDialog('Settings'), [
+    setDialog,
+  ])
+  const logout = useCallback(() => {
+    history.push('/')
+    setToken('')
+  }, [history, setToken])
   const showDetailDialog = useCallback(
     (data: { blobUrl: string; metaItem: MetaItem }) => {
       setDetailData(data)
@@ -92,6 +108,7 @@ export const RepositoryPage = () => {
     <Container>
       <DialogUpload onUploadFinished={onUploadFinished} />
       <DialogDetail {...detailData} />
+      <DialogSettings />
       <ItemsGrid>
         {_.map(items, (item) => (
           <StoredItem
@@ -104,7 +121,11 @@ export const RepositoryPage = () => {
           />
         ))}
       </ItemsGrid>
-      <FixedControls onAdd={showAddDialog} onSettings={_.noop} />
+      <FixedControls
+        onAdd={showAddDialog}
+        onSettings={showSettingsDialog}
+        onLogout={logout}
+      />
       <BottomProbe ref={bottomProbe} />
     </Container>
   )

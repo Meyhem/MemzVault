@@ -3,6 +3,7 @@ import { FC, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import _ from 'lodash'
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 import { dialogVisibility } from '../state/dialogState'
 import { Dialog } from './Dialog'
@@ -20,6 +21,7 @@ const DropZoneContainer = styled.div`
 `
 
 export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
+  const { t } = useTranslation()
   const [dialog] = useRecoilState(dialogVisibility)
   const { notifyHttp, notify } = useNotifications()
 
@@ -47,13 +49,13 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
       })
       await post(formData)
 
-      notifyHttp(request, response, 'Image/s uploaded')
+      notifyHttp(request, response, t('strings:ImagesUploaded'))
 
       if (response.ok) {
         onUploadFinished(response.data.data)
       }
     },
-    [post, notifyHttp, request, response, onUploadFinished]
+    [post, notifyHttp, request, response, t, onUploadFinished]
   )
 
   const pasteHandler = useCallback(
@@ -66,9 +68,9 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
       const str = e.clipboardData.getData('text/plain')
       try {
         const url = new URL(str)
-        notify('Paste', 'Downloading URL', 'success')
+        notify('Paste', t('strings:DownloadingUrl'), 'success')
         await uploadPost({ url })
-        notifyHttp(uploadRequest, uploadResponse, 'Downloaded!')
+        notifyHttp(uploadRequest, uploadResponse, t('strings:Downloaded'))
         if (uploadResponse.ok) {
           const newMeta = uploadResponse.data?.data
           if (newMeta) {
@@ -76,13 +78,14 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
           }
         }
       } catch (e) {
-        notify('Paste', 'Nothing reasonable in clipboard', 'warning')
+        notify('Paste', t('strings:BadClipdoard'), 'warning')
       }
     },
     [
       notify,
       notifyHttp,
       onUploadFinished,
+      t,
       uploadFiles,
       uploadPost,
       uploadRequest,
@@ -101,7 +104,7 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
     dialog === 'Upload' && (
       <Dialog>
         <DropZoneContainer {...getRootProps()}>
-          {loading && 'Uploading'}
+          {loading && t('strings:Uploading')}
           {!loading && <p>Click, drag files here or paste to upload</p>}
           <input {...getInputProps()} disabled={loading} />
         </DropZoneContainer>

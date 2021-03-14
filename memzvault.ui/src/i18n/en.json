@@ -1,4 +1,17 @@
 {
+  "strings": {
+    "ImagesUploaded": "Image/s uploaded",
+    "DownloadingUrl": "Downloading URL",
+    "Uploading": "Uploading",
+    "Downloaded": "Downloaded",
+    "BadClipdoard": "Nothing reasonable in clipboard",
+    "ConfirmDelete": "Are you sure to delete ?",
+    "TagsUpdated": "Tags updated",
+    "ItemDeleted": "Deleted",
+    "SelectTags": "Select tags...",
+    "Loading": "Loading..."
+  },
+
   "validation": {
     "Required": "Required"
   },

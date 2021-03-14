@@ -16,6 +16,17 @@ function parseTok(tok: string) {
 
 export const tokenState = persistedAtom({ key: 'tokenState', default: '' })
 
+export const getRepositoryName = selector({
+  key: 'getRepositoryName',
+  get: ({ get }) => {
+    const stored = get(tokenState)
+    if (!stored) return ''
+
+    const tok = parseTok(stored) as any
+    return tok && tok['memz.repositoryName']
+  },
+})
+
 export const hasValidToken = selector({
   key: 'hasValidToken',
   get: ({ get }) => {

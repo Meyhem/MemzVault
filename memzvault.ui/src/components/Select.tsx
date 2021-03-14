@@ -1,8 +1,8 @@
-import RCCreatableSelect, { Props } from 'react-select/creatable'
+import RCSelect, { Props } from 'react-select'
 import { FC } from 'react'
 import styled from 'styled-components'
 
-const StyledSelect = styled(RCCreatableSelect)`
+const StyledSelect = styled(RCSelect)`
   .react-select__control {
     background: ${({ theme }) => theme.colors.bg1};
     border: none;
@@ -39,18 +39,16 @@ const StyledSelect = styled(RCCreatableSelect)`
     }
   }
 
+  .react-select__single-value {
+    color: ${({ theme }) => theme.colors.text1};
+  }
   .react-select__indicator-separator {
     display: none;
   }
 `
 
-export const CreatableSelect: FC<Props<any, true>> = (props) => {
+export const Select: FC<Props<any, false>> = (props) => {
   return (
-    <StyledSelect
-      classNamePrefix="react-select"
-      isMulti={true}
-      {...props}
-      {...({} as any)}
-    />
+    <StyledSelect classNamePrefix="react-select" {...props} {...({} as any)} />
   )
 }
