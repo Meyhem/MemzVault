@@ -17,6 +17,7 @@ import { dialogVisibility } from '../state/dialogState'
 import { tokenState } from '../state/tokenState'
 import { useHistory } from 'react-router'
 import { usePersistedState } from '../hooks/usePersistedState'
+import { useHotkeys } from '../hooks/useRepositoryHotkeys'
 
 const Container = styled.div`
   display: flex;
@@ -59,35 +60,59 @@ function getUniqueTagsByFrequency(items: MetaItem[]) {
 
 export const RepositoryPage = () => {
   useGlobalHook()
+
   const { bottomProbe, items, setItems } = useInfinityLoader()
   const [, setDialog] = useRecoilState(dialogVisibility)
   const [, setToken] = usePersistedState(tokenState)
   const history = useHistory()
 
-  const [detailData, setDetailData] = useState<{
-    blobUrl: string
-    metaItem: MetaItem
-  }>(null)
+  const [detailItemId, setDetailItemId] = useState<string>(null)
+  const handlePrev = useCallback(() => {
+    let index = detailItemId
+      ? _.findIndex(items, (item) => item.itemId === detailItemId)
+      : 0
+
+    index = _.clamp(index - 1, 0, Math.max(items.length - 1, 0))
+
+    setDetailItemId(items[index].itemId)
+  }, [detailItemId, items])
+
+  const handleNext = useCallback(() => {
+    let index = detailItemId
+      ? _.findIndex(items, (item) => item.itemId === detailItemId)
+      : 0
+
+    index = _.clamp(index + 1, 0, Math.max(items.length - 1, 0))
+
+    setDetailItemId(items[index].itemId)
+  }, [detailItemId, items])
 
   const tagList = useMemo(() => getUniqueTagsByFrequency(items), [items])
 
   const showAddDialog = useCallback(() => setDialog('Upload'), [setDialog])
+
   const showSettingsDialog = useCallback(() => setDialog('Settings'), [
     setDialog,
   ])
+
+  const closeDialog = useCallback(() => {
+    setDialog(null)
+  }, [setDialog])
+
   const logout = useCallback(() => {
     history.push('/')
     setToken('')
   }, [history, setToken])
-  const showDetailDialog = useCallback(
-    (data: { blobUrl: string; metaItem: MetaItem }) => {
-      setDetailData(data)
+
+  const handleShowDetail = useCallback(
+    (itemId: string) => {
+      setDetailItemId(itemId)
       setDialog('Detail')
     },
     [setDialog]
   )
 
-  const onUploadFinished = useCallback(
+  const handleUploadFinished = useCallback(
     (newItems) => {
       setItems((i) => [...newItems, ...i])
       setDialog(null)
@@ -95,19 +120,50 @@ export const RepositoryPage = () => {
     [setDialog, setItems]
   )
 
-  const handleItemDelete = (item: MetaItem) => {
-    setItems(_.reject(items, (it) => it.itemId === item.itemId))
-  }
-  const handleItemUpdate = (item: MetaItem) => {
-    const idx = _.findIndex(items, (it) => it.itemId == item.itemId)
-    const updatedItems = [...items.slice(0, idx), item, ...items.slice(idx + 1)]
-    setItems(updatedItems)
-  }
+  const handleItemDelete = useCallback(
+    (item: MetaItem) => {
+      setItems((storedItems) =>
+        _.reject(storedItems, (it) => it.itemId === item.itemId)
+      )
+    },
+    [setItems]
+  )
+
+  const handleItemUpdate = useCallback(
+    (updatedItem: MetaItem) => {
+      setItems((storedItems) =>
+        _.map(storedItems, (item) =>
+          item.itemId === updatedItem.itemId
+            ? { ...item, ...updatedItem }
+            : item
+        )
+      )
+    },
+    [setItems]
+  )
+
+  const handleBlobLoad = useCallback(
+    (itemId: string, url: string) => {
+      setItems((storedItems) =>
+        _.map(storedItems, (item) =>
+          item.itemId === itemId ? { ...item, blobUrl: url } : item
+        )
+      )
+    },
+    [setItems]
+  )
+
+  useHotkeys({
+    onAdd: showAddDialog,
+    onEscape: closeDialog,
+    onPrev: handlePrev,
+    onNext: handleNext,
+  })
 
   return (
     <Container>
-      <DialogUpload onUploadFinished={onUploadFinished} />
-      <DialogDetail {...detailData} />
+      <DialogUpload onUploadFinished={handleUploadFinished} />
+      <DialogDetail item={_.find(items, (it) => it.itemId === detailItemId)} />
       <DialogSettings />
       <ItemsGrid>
         {_.map(items, (item) => (
@@ -116,7 +172,8 @@ export const RepositoryPage = () => {
             item={item}
             onDeleted={handleItemDelete}
             onUpdated={handleItemUpdate}
-            onDetail={showDetailDialog}
+            onDetail={handleShowDetail}
+            onBlobLoad={handleBlobLoad}
             allTags={tagList}
           />
         ))}

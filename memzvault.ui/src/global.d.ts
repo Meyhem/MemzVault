@@ -15,5 +15,6 @@ declare global {
     mimeType: string
     name: string
     tags: string[]
+    blobUrl?: string
   }
 }

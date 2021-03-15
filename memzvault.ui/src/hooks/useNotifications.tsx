@@ -33,7 +33,7 @@ export function useNotifications() {
         >
           {!req.error && res.ok
             ? successMessage || 'Done'
-            : _.toString(req.error) || (res.data as any)?.error?.errorMessage}
+            : (res.data as any)?.error?.errorMessage || _.toString(req.error)}
         </Notification>,
         { appearance: !req.error && res.ok ? 'success' : 'error' }
       ),

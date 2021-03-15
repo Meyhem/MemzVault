@@ -79,9 +79,10 @@ const ControlIcon = styled.span`
 interface StoredItemProps {
   item: MetaItem
   allTags: string[]
-  onDetail(data: { blobUrl: string; metaItem: MetaItem }): void
+  onDetail(itemId: string): void
   onDeleted(item: MetaItem): void
   onUpdated(item: MetaItem): void
+  onBlobLoad(itemId: string, url: string): void
 }
 
 const tagsToOptions = (tags: string[]) =>
@@ -93,8 +94,8 @@ export const StoredItem: FC<StoredItemProps> = ({
   onDetail,
   onDeleted,
   onUpdated,
+  onBlobLoad,
 }) => {
-  const [blobUrl, setBlobUrl] = useState<string>(null)
   const [tags, setTags] = useState<string[]>([...item.tags])
   const { notifyHttp } = useNotifications()
   const { t } = useTranslation()
@@ -147,8 +148,8 @@ export const StoredItem: FC<StoredItemProps> = ({
   )
 
   const handleItemClick = useCallback(() => {
-    onDetail({ blobUrl, metaItem: item })
-  }, [blobUrl, item, onDetail])
+    onDetail(item.itemId)
+  }, [item.itemId, onDetail])
 
   const handleTagsChange = useCallback(
     async (newVal: OptionTypeBase) => {
@@ -163,10 +164,10 @@ export const StoredItem: FC<StoredItemProps> = ({
     const run = async () => {
       await get()
       const b = await response.blob()
-      setBlobUrl(URL.createObjectURL(b))
+      onBlobLoad(item.itemId, URL.createObjectURL(b))
     }
     run()
-  }, [get, response])
+  }, [get, item.itemId])
 
   const tagOptions = useMemo(
     () => _.map(allTags, (t) => ({ label: t, value: t })),
@@ -183,10 +184,10 @@ export const StoredItem: FC<StoredItemProps> = ({
         </ControlItem>
       </Controls>
       <ImageContainer onClick={handleItemClick}>
-        {isImage(item) && blobUrl && <Image src={blobUrl} />}
-        {isVideo(item) && blobUrl && (
+        {isImage(item) && item.blobUrl && <Image src={item.blobUrl} />}
+        {isVideo(item) && item.blobUrl && (
           <Video preload="metadata">
-            <source src={blobUrl} type={item.mimeType} />
+            <source src={item.blobUrl} type={item.mimeType} />
           </Video>
         )}
       </ImageContainer>

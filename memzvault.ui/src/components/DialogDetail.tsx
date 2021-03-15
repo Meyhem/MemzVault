@@ -8,8 +8,7 @@ import { dialogVisibility } from '../state/dialogState'
 import { Dialog } from './Dialog'
 
 interface DialogDetailProps {
-  blobUrl: string
-  metaItem: MetaItem
+  item: MetaItem
 }
 
 const Image = styled.img`
@@ -22,7 +21,7 @@ const Video = styled.video`
   min-width: 40vw;
 `
 
-export const DialogDetail: FC<DialogDetailProps> = ({ blobUrl, metaItem }) => {
+export const DialogDetail: FC<DialogDetailProps> = ({ item }) => {
   const [dialog] = useRecoilState(dialogVisibility)
   return (
     dialog === 'Detail' && (
@@ -38,10 +37,10 @@ export const DialogDetail: FC<DialogDetailProps> = ({ blobUrl, metaItem }) => {
           }}
         >
           <TransformComponent>
-            {isImage(metaItem) && <Image src={blobUrl} />}
-            {isVideo(metaItem) && (
+            {isImage(item) && <Image src={item.blobUrl} />}
+            {isVideo(item) && (
               <Video preload="metadata" controls={true}>
-                <source src={blobUrl} type={metaItem.mimeType} />
+                <source src={item.blobUrl} type={item.mimeType} />
               </Video>
             )}
           </TransformComponent>

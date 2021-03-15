@@ -17,6 +17,7 @@ import { Flex } from './Flex'
 
 const Container = styled.div`
   display: flex;
+  flex-wrap: wrap;
   width: 100%;
 `
 
@@ -24,6 +25,7 @@ const SettingsItem = styled.div`
   display: flex;
   flex-direction: column;
   width: 50%;
+  margin-bottom: 50px;
 `
 
 const Label = styled.span`
@@ -102,6 +104,12 @@ export const DialogSettings = () => {
                 updateSettings({ language: v.value })
               }}
             />
+          </SettingsItem>
+          <SettingsItem>
+            <Label>Keybinds</Label>
+            <div>[+] Upload new</div>
+            <div>[A] Prev item</div>
+            <div>[D] Next item</div>
           </SettingsItem>
         </Container>
       </Dialog>

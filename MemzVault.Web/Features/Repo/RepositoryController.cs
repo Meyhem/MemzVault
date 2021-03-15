@@ -102,7 +102,7 @@ namespace MemzVault.Web.Features.Repo
             using var resp = await client.GetAsync(model.Url);
             if (!resp.IsSuccessStatusCode)
             {
-                throw new MemzException(MemzErrorCode.DownloadFailed, $"Cannot download image from {model.Url}");
+                throw new MemzException(MemzErrorCode.DownloadFailed, $"Cannot download image [{resp.StatusCode}] {model.Url}");
             }
 
             var mime = resp.Content.Headers.ContentType.MediaType ?? string.Empty;
