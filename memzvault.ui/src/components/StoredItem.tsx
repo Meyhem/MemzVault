@@ -167,6 +167,7 @@ export const StoredItem: FC<StoredItemProps> = ({
       onBlobLoad(item.itemId, URL.createObjectURL(b))
     }
     run()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [get, item.itemId])
 
   const tagOptions = useMemo(

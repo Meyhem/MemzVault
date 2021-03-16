@@ -37,10 +37,15 @@ namespace MemzVault.Web.Features.Repo
 
         [HttpGet]
         [Route("list")]
-        public async Task<ApiResponse<PagedData<StoredItemInfo>>> ListRepository([FromQuery] ApiPagedRequest model)
+        public async Task<ApiResponse<PagedData<StoredItemInfo>>> ListRepository([FromQuery] ListRepositoryRequest model)
         {
             model.Normalize();
-            var (items, total) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), model.Offset, model.Limit, null);
+
+            var (items, total) = await repo.ListRepositoryAsync(GetRepository(),
+                GetPassphrase(),
+                model.Offset,
+                model.Limit,
+                info => model.Tags.IsNullOrEmpty() || info.Tags.Intersect(model.Tags).Any());
 
             return ApiResponse.FromData<PagedData<StoredItemInfo>>(new(items, total));
         }
@@ -59,7 +64,7 @@ namespace MemzVault.Web.Features.Repo
         public async Task<IActionResult> DeleteItem([FromRoute] string id)
         {
             await repo.DeleteItem(GetRepository(), GetPassphrase(), id);
-            
+
             return Ok();
         }
 
@@ -79,21 +84,21 @@ namespace MemzVault.Web.Features.Repo
                 ids.Add(id);
 
                 await repo.StoreItem(
-                    GetRepository(), 
-                    GetPassphrase(), 
-                    id, 
-                    file.ToStoredItemMetadata(), 
+                    GetRepository(),
+                    GetPassphrase(),
+                    id,
+                    file.ToStoredItemMetadata(),
                     file.OpenReadStream());
             }
 
             var (uploadedInfos, _) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, int.MaxValue, info => ids.Contains(info.ItemId));
-            
+
             return Ok(ApiResponse.FromData(uploadedInfos));
         }
 
         [HttpPost]
         [Route("items/remote-download")]
-        public async Task<IActionResult> RemoteDownloadItem([FromBody]RemoteDownloadRequest model)
+        public async Task<IActionResult> RemoteDownloadItem([FromBody] RemoteDownloadRequest model)
         {
             HttpClient client = new();
             client.DefaultRequestHeaders.UserAgent.Clear();
@@ -106,7 +111,7 @@ namespace MemzVault.Web.Features.Repo
             }
 
             var mime = resp.Content.Headers.ContentType.MediaType ?? string.Empty;
-            
+
             if (!MimeMappings.IsSupportedMime(mime))
             {
                 throw new MemzException(MemzErrorCode.InvalidFileType, $"Invalid file type {mime}");
@@ -122,14 +127,14 @@ namespace MemzVault.Web.Features.Repo
             await repo.StoreItem(GetRepository(), GetPassphrase(), id, meta, stream);
 
             var (info, _) = (await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, 1, inf => inf.ItemId == id));
-            
+
             return Ok(ApiResponse.FromData(info.FirstOrDefault()));
         }
 
 
         [HttpPut]
         [Route("items/{id}/meta")]
-        public async Task<IActionResult> UpdateMeta([FromRoute]string id, [FromBody]StoredItemInfo meta)
+        public async Task<IActionResult> UpdateMeta([FromRoute] string id, [FromBody] StoredItemInfo meta)
         {
             var stored = await repo.GetItemMetadata(GetRepository(), GetPassphrase(), id);
 

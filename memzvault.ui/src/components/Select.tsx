@@ -52,3 +52,14 @@ export const Select: FC<Props<any, false>> = (props) => {
     <StyledSelect classNamePrefix="react-select" {...props} {...({} as any)} />
   )
 }
+
+export const MultiSelect: FC<Props<any, true>> = (props) => {
+  return (
+    <StyledSelect
+      classNamePrefix="react-select"
+      isMulti={true}
+      {...props}
+      {...({} as any)}
+    />
+  )
+}
