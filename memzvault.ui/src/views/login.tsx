@@ -33,6 +33,7 @@ export const LoginPage = () => {
 
   const { post, request, response, loading } = useApi<MemzResponse<string>>({
     path: '/api/auth/token',
+    method: 'POST',
   })
 
   return (

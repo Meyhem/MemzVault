@@ -1,4 +1,4 @@
-import { useFetch, UseFetch } from 'use-http'
+import { CachePolicies, useFetch, UseFetch } from 'use-http'
 import { stringify } from 'querystring'
 import { useRecoilValue } from 'recoil'
 import { useEffect } from 'react'
@@ -28,6 +28,7 @@ interface CallConfig {
 }
 
 export function useApi<T>(cfg: CallConfig, deps?: Array<any>): UseFetch<T> {
+  cfg = { method: 'GET', ...cfg }
   const url = new URL(cfg.path, config.apiUrl)
   url.search = stringify(cfg.params)
 
@@ -55,6 +56,11 @@ export function useApi<T>(cfg: CallConfig, deps?: Array<any>): UseFetch<T> {
     {
       method: cfg.method,
       headers: { ...additionalHeaders },
+      cachePolicy:
+        cfg.method === 'GET'
+          ? CachePolicies.CACHE_FIRST
+          : CachePolicies.NO_CACHE,
+      cache: cfg.method === 'GET' ? undefined : 'no-cache',
       interceptors: {
         response: ({ response }) => {
           if (response.status === 401) {
