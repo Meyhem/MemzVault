@@ -13,6 +13,7 @@ export function useInfinityLoader() {
 
   // check is is scrolled on bottom
   const checkProbeVisible = useCallback(() => {
+    if (!bottomProbe.current) return
     const screenHeight = Math.max(
       document.documentElement.clientHeight || 0,
       window.innerHeight || 0

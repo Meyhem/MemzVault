@@ -71,10 +71,19 @@ export const DialogSettings = () => {
     value: lang,
   }))
 
-  const fontOptions = _.map(['Source Code Pro', 'UnifrakturMaguntia'], (f) => ({
-    value: f,
-    label: <span style={{ fontFamily: f }}>{f}</span>,
-  }))
+  const fontOptions = _.map(
+    [
+      'Source Code Pro',
+      'Audiowide',
+      'UnifrakturMaguntia',
+      'Boogaloo',
+      'Merienda One',
+    ],
+    (f) => ({
+      value: f,
+      label: <span style={{ fontFamily: f }}>{f}</span>,
+    })
+  )
 
   return (
     dialog === 'Settings' && (
@@ -83,14 +92,10 @@ export const DialogSettings = () => {
           <SettingsItem>
             <Label>Font</Label>
             <Select
-              value={
-                settings[repoName]
-                  ? {
-                      label: settings[repoName]?.font,
-                      value: settings[repoName]?.font,
-                    }
-                  : fontOptions[0]
-              }
+              value={{
+                label: settings[repoName]?.font || 'Source Code Pro',
+                value: settings[repoName]?.font || 'Source Code Pro',
+              }}
               options={fontOptions}
               onChange={(v) => {
                 updateSettings({ font: v.value })
