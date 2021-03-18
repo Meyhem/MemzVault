@@ -8,6 +8,8 @@ import { defaultTheme, GlobalStyle } from './common/theme'
 import { history } from './common/history'
 import { LoginPage } from './views/login'
 import { RepositoryPage } from './views/repository'
+import { CreatePage } from './views/create'
+import { ResetPage } from './views/reset'
 import { usePersistedState } from './hooks/usePersistedState'
 import { settingsState } from './state/repositorySettings'
 import { getRepositoryName } from './state/tokenState'
@@ -30,6 +32,8 @@ export function App() {
           <Switch>
             <Route path="/" exact component={LoginPage} />
             <Route path="/repository" exact component={RepositoryPage} />
+            <Route path="/create" exact component={CreatePage} />
+            <Route path="/reset" exact component={ResetPage} />
           </Switch>
         </Router>
       </ToastProvider>

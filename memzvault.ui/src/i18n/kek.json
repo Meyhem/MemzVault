@@ -9,7 +9,8 @@
     "TagsUpdated": "Tags sneeded",
     "ItemDeleted": "BTFO'd",
     "SelectTags": "Select tags...",
-    "Loading": "Sneeding..."
+    "Loading": "Sneeding...",
+    "DropzoneText": "Pick sneed, drag sneed or paste sneed"
   },
 
   "validation": {

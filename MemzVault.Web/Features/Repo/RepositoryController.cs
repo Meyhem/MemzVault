@@ -30,7 +30,7 @@ namespace MemzVault.Web.Features.Repo
         [Route("")]
         public async Task<IActionResult> CreateRepository([FromBody] CreateRepositoryRequest model)
         {
-            await repo.CreateRepository(model.Repository, model.Passphrase);
+            await repo.CreateRepository(model.Repository, model.Passphrase, model.AdminKey);
 
             return StatusCode((int)HttpStatusCode.Created);
         }

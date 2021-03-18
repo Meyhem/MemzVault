@@ -29,6 +29,7 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
     {
       method: 'POST',
       path: `/api/repository/items`,
+      authenticatedCall: true,
     }
   )
 
@@ -39,6 +40,7 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
   } = useApi<MemzResponse<MetaItem>>({
     method: 'POST',
     path: `/api/repository/items/remote-download`,
+    authenticatedCall: true,
   })
 
   const uploadFiles = useCallback(
@@ -105,7 +107,7 @@ export const DialogUpload: FC<UploadDialogProps> = ({ onUploadFinished }) => {
       <Dialog>
         <DropZoneContainer {...getRootProps()}>
           {loading && t('strings:Uploading')}
-          {!loading && <p>Click, drag files here or paste to upload</p>}
+          {!loading && <p>{t('strings:DropzoneText')}</p>}
           <input {...getInputProps()} disabled={loading} />
         </DropZoneContainer>
       </Dialog>

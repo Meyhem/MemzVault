@@ -17,5 +17,10 @@ namespace MemzVault.Core.Config
         {
             return Path.GetFullPath(config.StorageFolder);
         }
+
+        public string GetAdminKey()
+        {
+            return config.AdminKey;
+        }
     }
 }

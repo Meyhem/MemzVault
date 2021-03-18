@@ -19,6 +19,7 @@ namespace MemzVault.Core.Exceptions
         // Auth
         InvalidPassphrase,
         InvalidRepository,
+        InvalidAdminKey,
 
         // Extra
         DownloadFailed,

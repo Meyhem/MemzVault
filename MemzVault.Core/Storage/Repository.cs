@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MemzVault.Core.Config;
 using MemzVault.Core.Crypto;
+using MemzVault.Core.Exceptions;
 using MemzVault.Core.Extensions;
 using MemzVault.Core.Storage;
 
@@ -17,15 +19,22 @@ namespace MemzVault.Web.Storage
 
         private readonly IStorageDriver driver;
         private readonly ICryptoService crypto;
+        private readonly IMemzConfigProvider configProvider;
 
-        public Repository(IStorageDriver driver, ICryptoService crypto)
+        public Repository(IStorageDriver driver, ICryptoService crypto, IMemzConfigProvider configProvider)
         {
             this.driver = driver;
             this.crypto = crypto;
+            this.configProvider = configProvider;
         }
 
-        public async Task CreateRepository(string repo, string passphrase)
+        public async Task CreateRepository(string repo, string passphrase, string adminKey)
         {
+            if (!configProvider.GetAdminKey().Equals(adminKey))
+            {
+                throw new MemzException(MemzErrorCode.InvalidAdminKey, "Invalid admin key");
+            }
+
             var repoKey = crypto.GenerateRandomBytes(128);
             var repoKeyPacket = crypto.PassphraseEncrypt(Encoding.UTF8.GetBytes(passphrase), repoKey);
 

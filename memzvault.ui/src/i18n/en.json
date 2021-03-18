@@ -9,7 +9,8 @@
     "TagsUpdated": "Tags updated",
     "ItemDeleted": "Deleted",
     "SelectTags": "Select tags...",
-    "Loading": "Loading..."
+    "Loading": "Loading...",
+    "DropzoneText": "Click, drag files here or paste to upload"
   },
 
   "validation": {

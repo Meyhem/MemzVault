@@ -14,6 +14,7 @@ import { usePersistedState } from '../hooks/usePersistedState'
 import flagUs from '../assets/flag-us.png'
 import flagKek from '../assets/flag-kek.png'
 import { Flex } from './Flex'
+import { Link } from 'react-router-dom'
 
 const Container = styled.div`
   display: flex;
@@ -82,10 +83,14 @@ export const DialogSettings = () => {
           <SettingsItem>
             <Label>Font</Label>
             <Select
-              value={{
-                label: settings[repoName]?.font,
-                value: settings[repoName]?.font,
-              }}
+              value={
+                settings[repoName]
+                  ? {
+                      label: settings[repoName]?.font,
+                      value: settings[repoName]?.font,
+                    }
+                  : fontOptions[0]
+              }
               options={fontOptions}
               onChange={(v) => {
                 updateSettings({ font: v.value })
@@ -110,6 +115,9 @@ export const DialogSettings = () => {
             <div>[+] Upload new</div>
             <div>[A] Prev item</div>
             <div>[D] Next item</div>
+          </SettingsItem>
+          <SettingsItem>
+            <Link to="/create">Create repo</Link>
           </SettingsItem>
         </Container>
       </Dialog>

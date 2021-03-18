@@ -10,7 +10,7 @@ export function useGlobalHook() {
   const repoName = useRecoilValue(getRepositoryName)
   const { i18n } = useTranslation()
 
-  const lang = _.get(settings as any, `${repoName}.language`)
+  const lang = _.get(settings as any, `${repoName}.language`) || 'en'
   useEffect(() => {
     if (!lang) return
     i18n.changeLanguage(lang)

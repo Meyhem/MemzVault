@@ -6,10 +6,20 @@ import {
   SetterOrUpdater,
 } from 'recoil'
 
+function safeJsonParse(str: any) {
+  try {
+    return JSON.parse(str)
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('safeJsonParse', e)
+    return null
+  }
+}
+
 export function persistedAtom<T>(cfg: AtomOptions<T>) {
   return atom<T>({
     ...cfg,
-    default: JSON.parse(localStorage.getItem(cfg.key)) || cfg.default,
+    default: safeJsonParse(localStorage.getItem(cfg.key)) || cfg.default,
   })
 }
 
