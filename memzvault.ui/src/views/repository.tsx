@@ -11,6 +11,7 @@ import {
   FixedControls,
   DialogDetail,
   DialogSettings,
+  CreatableSelect,
 } from '../components'
 
 import { dialogVisibility } from '../state/dialogState'
@@ -61,7 +62,7 @@ function getUniqueTagsByFrequency(items: MetaItem[]) {
 export const RepositoryPage = () => {
   useGlobalHook()
 
-  const { bottomProbe, items, setItems } = useInfinityLoader()
+  const { bottomProbe, items, setItems, tags, setTags } = useInfinityLoader()
   const [, setDialog] = useRecoilState(dialogVisibility)
   const [, setToken] = usePersistedState(tokenState)
   const history = useHistory()
@@ -88,6 +89,14 @@ export const RepositoryPage = () => {
   }, [detailItemId, items])
 
   const tagList = useMemo(() => getUniqueTagsByFrequency(items), [items])
+  const tagOptions = useMemo(
+    () => _.map(tagList, (t) => ({ label: t, value: t })),
+    [tagList]
+  )
+  const selectedTagOptions = useMemo(
+    () => _.map(tags, (t) => ({ label: t, value: t })),
+    [tags]
+  )
 
   const showAddDialog = useCallback(() => setDialog('Upload'), [setDialog])
 
@@ -165,6 +174,16 @@ export const RepositoryPage = () => {
       <DialogUpload onUploadFinished={handleUploadFinished} />
       <DialogDetail item={_.find(items, (it) => it.itemId === detailItemId)} />
       <DialogSettings />
+
+      <CreatableSelect
+        closeMenuOnSelect={false}
+        options={tagOptions}
+        value={selectedTagOptions}
+        onChange={(vals) => {
+          setTags(_.map(vals, (v) => v.value))
+        }}
+      />
+
       <ItemsGrid>
         {_.map(items, (item) => (
           <StoredItem

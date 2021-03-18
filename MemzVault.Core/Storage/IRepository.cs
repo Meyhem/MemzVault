@@ -12,7 +12,7 @@ namespace MemzVault.Core.Storage
         Task<StoredItemMetadata> GetItemMetadata(string repo, string passphrase, string itemId);
         Task<RepositoryManifest> GetRepositoryManifest(string repo);
         Task<byte[]> GetRepositoryMasterKey(string repo, string passphrase);
-        Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, string passphrase, int offset, int limit, Func<StoredItemInfo, bool> predicate);
+        Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, string passphrase, int offset, int limit, string[] tags, Func<StoredItemInfo, bool> predicate);
         Task<bool> RepositoryExists(string repo);
         Task<(Stream, StoredItemMetadata)> RetrieveItem(string repo, string passphrase, string itemId);
         Task SetItemMetadata(string repo, string passphrase, string itemId,  StoredItemMetadata meta);

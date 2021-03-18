@@ -6,8 +6,10 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MemzVault.Core.Crypto;
+using MemzVault.Core.Extensions;
+using MemzVault.Core.Storage;
 
-namespace MemzVault.Core.Storage
+namespace MemzVault.Web.Storage
 {
     public class Repository : IRepository
     {
@@ -33,10 +35,11 @@ namespace MemzVault.Core.Storage
             await SetRepositoryManifest(repo, manifest);
         }
 
-        public async Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo, 
-            string passphrase, 
-            int offset, 
-            int limit, 
+        public async Task<(IEnumerable<StoredItemInfo>, int)> ListRepositoryAsync(string repo,
+            string passphrase,
+            int offset,
+            int limit,
+            string[] tags,
             Func<StoredItemInfo, bool> predicate)
         {
             var ids = await driver.ListRepositoryItemIds(repo);
@@ -45,23 +48,34 @@ namespace MemzVault.Core.Storage
             foreach (var id in ids)
             {
                 var meta = await GetItemMetadata(repo, passphrase, id);
+                var tagMatchScore = 1;
+                if (!tags.IsNullOrEmpty())
+                {
+                    var storedTags = meta.Tags ?? Array.Empty<string>();
+
+                    tagMatchScore = storedTags.Intersect(tags, StringComparer.InvariantCultureIgnoreCase).Count();
+                }
+
+                if (tagMatchScore == 0) continue;
+
                 var info = new StoredItemInfo
                 {
                     ItemId = id,
                     MimeType = meta.MimeType,
                     Name = meta.Name,
                     OriginalFileName = meta.OriginalFilename,
-                    Tags = meta.Tags
+                    Tags = meta.Tags,
+                    TagMatchScore = tagMatchScore
                 };
 
                 if (predicate != null && !predicate(info)) continue;
 
                 items.Add(info);
             }
-
+            items = items.OrderByDescending(i => i.TagMatchScore).ToList();
             var ret = items.Skip(offset).Take(limit);
 
-            return (ret, items.Count());
+            return (ret, items.Count);
         }
 
         public async Task<bool> RepositoryExists(string repo)

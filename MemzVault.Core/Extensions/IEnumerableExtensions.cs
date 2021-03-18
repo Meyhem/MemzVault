@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace MemzVault.Web.Extensions
+namespace MemzVault.Core.Extensions
 {
     public static class IEnumerableExtensions
     {

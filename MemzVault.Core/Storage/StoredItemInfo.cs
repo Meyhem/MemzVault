@@ -7,5 +7,6 @@
         public string MimeType { get; set; }
         public string Name { get; set; }
         public string[] Tags { get; set; }
+        public int TagMatchScore { get; set; }
     }
 }

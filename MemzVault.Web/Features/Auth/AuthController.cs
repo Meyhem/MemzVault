@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using MemzVault.Core.Exceptions;
-using MemzVault.Web.Extensions;
+using MemzVault.Core.Extensions;
 using MemzVault.Web.Features.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

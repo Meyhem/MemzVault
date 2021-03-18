@@ -15,8 +15,6 @@ export function useHotkeys({
 }: UseHotkeysOptions) {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      console.log('event')
-
       switch (e.code) {
         case 'NumpadAdd':
           onAdd()

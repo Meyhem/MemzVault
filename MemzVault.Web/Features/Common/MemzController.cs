@@ -3,7 +3,7 @@ using System.Text;
 using MemzVault.Core.Crypto;
 using MemzVault.Core.Exceptions;
 using MemzVault.Core.Storage;
-using MemzVault.Web.Extensions;
+using MemzVault.Core.Extensions;
 using MemzVault.Web.Features.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

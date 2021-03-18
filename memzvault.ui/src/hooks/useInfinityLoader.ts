@@ -7,10 +7,12 @@ export function useInfinityLoader() {
   const [drained, setDrained] = useState(false)
   const [currentBatch, setCurrentBatch] = useState(0)
   const [items, setItems] = useState<MetaItem[]>([])
+  const [tags, setTags] = useState<string[]>([])
   const [isOnBottom, setIsOnBottom] = useState(false)
   const bottomProbe = useRef<HTMLDivElement>(null)
 
-  const triggerUpdate = useCallback(() => {
+  // check is is scrolled on bottom
+  const checkProbeVisible = useCallback(() => {
     const screenHeight = Math.max(
       document.documentElement.clientHeight || 0,
       window.innerHeight || 0
@@ -20,10 +22,11 @@ export function useInfinityLoader() {
     setIsOnBottom(scroll >= bottomProbe.current.offsetTop)
   }, [])
 
+  // register scroll hnd
   useEffect(() => {
-    document.addEventListener('scroll', triggerUpdate)
-    return () => document.removeEventListener('scroll', triggerUpdate)
-  }, [triggerUpdate])
+    document.addEventListener('scroll', checkProbeVisible)
+    return () => document.removeEventListener('scroll', checkProbeVisible)
+  }, [checkProbeVisible])
 
   const { data, get } = useApi<MemzResponse<{ items: MetaItem[] }>>({
     path: '/api/repository/list',
@@ -31,15 +34,26 @@ export function useInfinityLoader() {
     params: {
       offset: currentBatch * pageSize,
       limit: pageSize,
+      tags: tags,
     },
   })
 
+  // when scrolled down and is not finished
   useEffect(() => {
     if (isOnBottom && !drained) {
       get()
     }
   }, [isOnBottom, drained, get])
 
+  // when tags change start fetching from beginning
+  useEffect(() => {
+    setDrained(false)
+    setCurrentBatch(0)
+    setIsOnBottom(true)
+    setItems([])
+  }, [tags])
+
+  // when data received add them to list
   useEffect(() => {
     if (!data) return
 
@@ -50,12 +64,13 @@ export function useInfinityLoader() {
     setItems((items) => [...items, ...data.data.items])
     setCurrentBatch((b) => b + 1)
     setIsOnBottom(false)
-    _.defer(triggerUpdate)
-  }, [data, triggerUpdate])
+    _.defer(checkProbeVisible)
+  }, [data, checkProbeVisible])
 
+  // do first fetch
   useEffect(() => {
-    triggerUpdate()
-  }, [triggerUpdate])
+    checkProbeVisible()
+  }, [checkProbeVisible])
 
-  return { bottomProbe, items, setItems }
+  return { bottomProbe, items, setItems, tags, setTags }
 }

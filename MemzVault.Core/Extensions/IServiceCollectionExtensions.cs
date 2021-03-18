@@ -1,9 +1,10 @@
 ﻿using MemzVault.Core.Config;
 using MemzVault.Core.Crypto;
 using MemzVault.Core.Storage;
+using MemzVault.Web.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MemzVault.Core.Extensions
+namespace MemzVault.Web.Extensions
 {
     public static class IServiceCollectionExtensions
     {

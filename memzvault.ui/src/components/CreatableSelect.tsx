@@ -8,6 +8,10 @@ const StyledSelect = styled(RCCreatableSelect)`
     border: none;
   }
 
+  .react-select__input {
+    color: ${({ theme }) => theme.colors.text1};
+  }
+
   .react-select__menu {
     margin: 0;
     .react-select__menu-list {

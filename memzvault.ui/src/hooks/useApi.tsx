@@ -1,4 +1,4 @@
-import { CachePolicies, useFetch, UseFetch } from 'use-http'
+import { useFetch, UseFetch } from 'use-http'
 import { stringify } from 'querystring'
 import { useRecoilValue } from 'recoil'
 import { useEffect } from 'react'
@@ -54,8 +54,6 @@ export function useApi<T>(cfg: CallConfig, deps?: Array<any>): UseFetch<T> {
     url.href,
     {
       method: cfg.method,
-      cache: 'no-cache',
-      cachePolicy: CachePolicies.NO_CACHE,
       headers: { ...additionalHeaders },
       interceptors: {
         response: ({ response }) => {

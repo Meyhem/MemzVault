@@ -5,12 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using MemzVault.Web.Extensions;
-using MemzVault.Core.Config;
 using MemzVault.Core.Extensions;
-using System.IdentityModel.Tokens.Jwt;
-using MemzVault.Web.Features.Common;
+using MemzVault.Core.Config;
 using Microsoft.AspNetCore.Http.Features;
+using MemzVault.Web.Features.Common;
+using MemzVault.Web.Extensions;
 
 namespace MemzVault.Web
 {

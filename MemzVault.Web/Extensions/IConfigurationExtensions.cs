@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 
-namespace MemzVault.Web.Extensions
+namespace MemzVault.Core.Extensions
 {
     public static class IConfigurationExtensions
     {

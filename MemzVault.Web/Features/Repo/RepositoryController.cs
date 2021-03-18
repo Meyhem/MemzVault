@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MemzVault.Core.Exceptions;
+using MemzVault.Web.Features.Common;
 using MemzVault.Core.Storage;
 using MemzVault.Web.Extensions;
-using MemzVault.Web.Features.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +45,8 @@ namespace MemzVault.Web.Features.Repo
                 GetPassphrase(),
                 model.Offset,
                 model.Limit,
-                info => model.Tags.IsNullOrEmpty() || info.Tags.Intersect(model.Tags).Any());
+                model.Tags,
+                null);
 
             return ApiResponse.FromData<PagedData<StoredItemInfo>>(new(items, total));
         }
@@ -91,7 +92,7 @@ namespace MemzVault.Web.Features.Repo
                     file.OpenReadStream());
             }
 
-            var (uploadedInfos, _) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, int.MaxValue, info => ids.Contains(info.ItemId));
+            var (uploadedInfos, _) = await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, int.MaxValue, null, info => ids.Contains(info.ItemId));
 
             return Ok(ApiResponse.FromData(uploadedInfos));
         }
@@ -126,7 +127,7 @@ namespace MemzVault.Web.Features.Repo
 
             await repo.StoreItem(GetRepository(), GetPassphrase(), id, meta, stream);
 
-            var (info, _) = (await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, 1, inf => inf.ItemId == id));
+            var (info, _) = (await repo.ListRepositoryAsync(GetRepository(), GetPassphrase(), 0, 1, null, inf => inf.ItemId == id));
 
             return Ok(ApiResponse.FromData(info.FirstOrDefault()));
         }
