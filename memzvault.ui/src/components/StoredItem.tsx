@@ -85,9 +85,6 @@ interface StoredItemProps {
   onBlobLoad(itemId: string, url: string): void
 }
 
-const tagsToOptions = (tags: string[]) =>
-  _.map(tags, (t) => ({ label: t, value: t }))
-
 export const StoredItem: FC<StoredItemProps> = ({
   item,
   allTags,
@@ -96,13 +93,23 @@ export const StoredItem: FC<StoredItemProps> = ({
   onUpdated,
   onBlobLoad,
 }) => {
-  const [tags, setTags] = useState<string[]>([...item.tags])
+  const [tags, setTags] = useState<string[]>(item.tags)
   const { notifyHttp } = useNotifications()
   const { t } = useTranslation()
 
   const { get, loading, response } = useApi({
     path: `/api/repository/items/${item.itemId}`,
   })
+
+  const selectedTags = useMemo(
+    () => _.map(tags, (t) => ({ label: t, value: t })),
+    [tags]
+  )
+
+  const tagOptions = useMemo(
+    () => _.map(allTags, (t) => ({ label: t, value: t })),
+    [allTags]
+  )
 
   const {
     delete: deleteItem,
@@ -111,6 +118,7 @@ export const StoredItem: FC<StoredItemProps> = ({
   } = useApi<MemzResponse<any>>({
     method: 'DELETE',
     path: `/api/repository/items/${item.itemId}`,
+    authenticatedCall: true,
   })
 
   const { put: putMeta, request: metaRequest, response: metaResponse } = useApi<
@@ -118,6 +126,7 @@ export const StoredItem: FC<StoredItemProps> = ({
   >({
     method: 'PUT',
     path: `/api/repository/items/${item.itemId}/meta`,
+    authenticatedCall: true,
   })
 
   const handleDelete = useCallback(async () => {
@@ -170,11 +179,6 @@ export const StoredItem: FC<StoredItemProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [get, item.itemId])
 
-  const tagOptions = useMemo(
-    () => _.map(allTags, (t) => ({ label: t, value: t })),
-    [allTags]
-  )
-
   return (
     <StoredItemContainer>
       {loading && t('strings:Loading')}
@@ -197,7 +201,7 @@ export const StoredItem: FC<StoredItemProps> = ({
           <Tags>
             <CreatableSelect
               placeholder={t('strings:SelectTags')}
-              value={tagsToOptions(tags)}
+              value={selectedTags}
               closeMenuOnSelect={false}
               options={tagOptions}
               onChange={handleTagsChange}
