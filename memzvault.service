@@ -1,0 +1,14 @@
+[Unit]
+Description=Memzvault backend API
+
+[Service]
+WorkingDirectory=/var/www/memzvault/backend
+ExecStart=/usr/bin/dotnet /var/www/memzvault/backend
+Restart=always
+SyslogIdentifier=memzvault
+
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+[Install]
+WantedBy=multi-user.target

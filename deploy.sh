@@ -80,7 +80,21 @@ cp appsettings.Production.json $ARTIFACT/backend/appsettings.json
 stage "Nginx"
 cp memzvault.nginx.conf /etc/nginx/conf.d/memzvault.nginx.conf
 
+stage "Stop services"
+if [ `systemctl is-active memzvault` -eq 'active' ]; then
+  echo "Stopping memzvault backend"
+  systemctl stop memzvault
+fi
+
 stage "Deploy frontend"
 rm -rf DEPLOY_FOLDER/frontend
-cp $ARTIFACT/frontend DEPLOY_FOLDER/frontend
+cp -r $ARTIFACT/frontend $DEPLOY_FOLDER/frontend
 
+stage "Deploy backend"
+rm -rf DEPLOY_FOLDER/backend
+cp -r $ARTIFACT/backend $DEPLOY_FOLDER/backend
+
+stage "Start services"
+systemctl start memzvault
+systemctl enable memzvault
+nginx -s reload
