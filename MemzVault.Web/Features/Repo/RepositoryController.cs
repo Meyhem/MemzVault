@@ -28,6 +28,7 @@ namespace MemzVault.Web.Features.Repo
 
         [HttpPost]
         [Route("")]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateRepository([FromBody] CreateRepositoryRequest model)
         {
             await repo.CreateRepository(model.Repository, model.Passphrase, model.AdminKey);

@@ -31,7 +31,6 @@ export const CreatePage = () => {
   const { post, request, response, loading } = useApi<MemzResponse<string>>({
     path: '/api/repository',
     method: 'POST',
-    authenticatedCall: true,
   })
 
   return (
