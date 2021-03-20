@@ -55,9 +55,9 @@ yarn --version || die "No yarn install"
 git --version || die "No git install"
 
 stage "Prepare ground"
-
 rm -rf $ARTIFACT
 mkdir -p $ARTIFACT
+mkdir -p $DEPLOY_FOLDER
 git pull --ff-only https://github.com/Meyhem/MemzVault master 
 if [ ! -f appsettings.Production.json ]; then
   echo "Generating prod config 'appsettings.Production.json'"
@@ -79,3 +79,8 @@ cp appsettings.Production.json $ARTIFACT/backend/appsettings.json
 
 stage "Nginx"
 cp memzvault.nginx.conf /etc/nginx/conf.d/memzvault.nginx.conf
+
+stage "Deploy frontend"
+rm -rf DEPLOY_FOLDER/frontend
+cp $ARTIFACT/frontend DEPLOY_FOLDER/frontend
+
