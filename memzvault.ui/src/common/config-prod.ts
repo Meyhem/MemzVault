@@ -1,3 +1,3 @@
 export default {
-  apiUrl: 'http://sneed.fun',
+  apiUrl: 'https://sneed.fun',
 }
