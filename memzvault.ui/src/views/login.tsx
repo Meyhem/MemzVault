@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Field, Form } from 'react-final-form'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -48,7 +49,7 @@ export const LoginPage = () => {
 
             if (response.status === 200) {
               setToken(response.data.data)
-              history.push('/repository')
+              _.defer(() => history.push('/repository'))
             }
           }}
         >
