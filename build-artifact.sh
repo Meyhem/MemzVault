@@ -2,8 +2,38 @@
 
 FRONTEND=memzvault.ui
 ARTIFACT=artifact
-APPSETTINGS=$1
 DEPLOY_FOLDER=/var/www/memzvault
+
+SERVERKEY=`openssl rand -base64 16`
+ADMINKEY=`openssl rand -base64 16`
+ISSUERSIGNINGKEY=`openssl rand -base64 16`
+
+CONFIG="{
+  \"Urls\": \"http://localhost:5000\",
+  \"Memz\": {
+    \"ServerKey\": \"$SERVERKEY\",
+    \"AdminKey\": \"$ADMINKEY\",
+    \"StorageFolder\": \"/var/www/memzvault/storage\"
+  },
+  \"Jwt\": {
+    \"Audience\": \"MemzVault\",
+    \"SaveToken\": false,
+    \"RequireHttpsMetadata\": false,
+    \"TokenValidationParameters\": {
+      \"IssuerSigningKey\": \"$ISSUERSIGNINGKEY\",
+      \"ValidIssuer\": \"MemzVault\",
+      \"ValidAudience\": \"MemzVault\",
+      \"RequireExpirationTime\": true
+    }
+  },
+  \"Logging\": {
+    \"LogLevel\": {
+      \"Default\": \"Information\",
+      \"Microsoft\": \"Warning\",
+      \"Microsoft.Hosting.Lifetime\": \"Information\"
+    }
+  }
+}"
 
 die () {
   echo "Build failed: $1"
@@ -17,8 +47,6 @@ stage() {
   NSTAGE=$((NSTAGE+1))
 }
 
-test -f $APPSETTINGS || die "Missing production config file path (first positional argument)"
-
 stage "Check tools"
 dotnet --info || die "No dotnet install"
 node --version || die "No nodejs install"
@@ -31,6 +59,10 @@ stage "Prepare ground"
 rm -rf $ARTIFACT
 mkdir -p $ARTIFACT
 git pull https://github.com/Meyhem/MemzVault master
+if [ ! -f appsettings.Production.json ]; then
+  echo "Generating prod config 'appsettings.Production.json'"
+  echo  "$CONFIG" > appsettings.Production.json
+fi
 
 stage "Make Frontend"
 NODE_ENV=production yarn --cwd $FRONTEND build
@@ -42,7 +74,7 @@ dotnet publish --nologo --verbosity quiet --configuration Release --output $ARTI
 rm $ARTIFACT/backend/appsettings*.json
 
 stage "Configure"
-cp $APPSETTINGS $ARTIFACT/backend/appsettings.json
+cp appsettings.Production.json $ARTIFACT/backend/appsettings.json
 
 stage "Nginx"
 cp memzvault.nginx.conf /etc/nginx/conf.d/memzvault.nginx.conf

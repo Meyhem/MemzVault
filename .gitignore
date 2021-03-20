@@ -5,6 +5,7 @@
 
 MemzVault.Playground/Storage
 artifact
+/appsettings.Production.json
 
 # User-specific files
 *.rsuser
