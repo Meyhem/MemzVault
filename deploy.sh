@@ -92,6 +92,7 @@ rm -rf DEPLOY_FOLDER/frontend
 cp -r $ARTIFACT/frontend $DEPLOY_FOLDER/frontend
 
 stage "Deploy backend"
+cp memzvault.service /etc/systemd/system/memzvault.service
 rm -rf DEPLOY_FOLDER/backend
 cp -r $ARTIFACT/backend $DEPLOY_FOLDER/backend
 
