@@ -3,7 +3,7 @@ Description=Memzvault backend API
 
 [Service]
 WorkingDirectory=/var/www/memzvault/backend
-ExecStart=/usr/bin/dotnet /var/www/memzvault/backend
+ExecStart=/usr/bin/dotnet /var/www/memzvault/backend/MemzVault.Web.dll
 Restart=always
 SyslogIdentifier=memzvault
 
