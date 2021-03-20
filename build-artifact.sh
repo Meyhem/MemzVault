@@ -65,6 +65,7 @@ if [ ! -f appsettings.Production.json ]; then
 fi
 
 stage "Make Frontend"
+yarn
 NODE_ENV=production yarn --cwd $FRONTEND build
 mv $FRONTEND/build $ARTIFACT/frontend
 
