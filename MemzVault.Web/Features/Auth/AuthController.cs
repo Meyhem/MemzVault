@@ -28,6 +28,11 @@ namespace MemzVault.Web.Features.Auth
         [Route("token")]
         public async Task<IActionResult> CreateToken([FromBody] CreateTokenModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ApiResponse.FromError(MemzError.FromModelState(ModelState)));
+            }
+
             if (!await Repository.RepositoryExists(model.Repository))
             {
                 return BadRequest(
@@ -71,16 +76,6 @@ namespace MemzVault.Web.Features.Auth
             var str = jwt.WriteToken(tok);
 
             return Ok(ApiResponse.FromData(str));
-        }
-
-        [HttpPost]
-        [Route("test")]
-        [Authorize]
-        public IActionResult Validity()
-        {
-            var p = GetPassphrase();
-
-            return Ok();
         }
     }
 }

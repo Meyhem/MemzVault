@@ -23,7 +23,8 @@ namespace MemzVault.Core.Exceptions
 
         // Extra
         DownloadFailed,
-        InvalidFileType
+        InvalidFileType,
+        InvalidFields
     }
 
 

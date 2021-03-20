@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Text.Json.Serialization;
 using MemzVault.Core.Exceptions;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MemzVault.Web.Features.Common
 {
@@ -20,6 +22,19 @@ namespace MemzVault.Web.Features.Common
                 ErrorMessage = ex.Message,
                 Stack = ex.StackTrace,
                 GenericDescription = ex.ErrorCode.ToString()
+            };
+        }
+
+        public static MemzError FromModelState(ModelStateDictionary ms)
+        {
+            return new()
+            {
+                ErrorCode = MemzErrorCode.InvalidFields,
+                ErrorMessage = string.Join(", ", ms.Values
+                    .SelectMany(state => state.Errors)
+                    .Select(error => error.ErrorMessage)),
+                GenericDescription = "Some fields are invalid",
+                Stack = null
             };
         }
 

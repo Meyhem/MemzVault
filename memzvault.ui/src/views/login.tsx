@@ -41,7 +41,7 @@ export const LoginPage = () => {
     <Layout centered={true}>
       <BorderedBox padding={3}>
         <Form
-          initialValues={{ repository: '', passphrase: '' }}
+          lo={{ repository: '', passphrase: '' }}
           onSubmit={async ({ repository, passphrase }) => {
             await post({ repository, passphrase })
 
