@@ -62,7 +62,14 @@ function getUniqueTagsByFrequency(items: MetaItem[]) {
 export const RepositoryPage = () => {
   useGlobalHook()
 
-  const { bottomProbe, items, setItems, tags, setTags } = useInfinityLoader()
+  const {
+    bottomProbe,
+    items,
+    setItems,
+    tags,
+    setTags,
+    cache,
+  } = useInfinityLoader()
   const [, setDialog] = useRecoilState(dialogVisibility)
   const [, setToken] = usePersistedState(tokenState)
   const history = useHistory()
@@ -109,6 +116,7 @@ export const RepositoryPage = () => {
   }, [setDialog])
 
   const logout = useCallback(() => {
+    cache.clear()
     history.push('/')
     setToken('')
   }, [history, setToken])

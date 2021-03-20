@@ -29,7 +29,7 @@ export function useInfinityLoader() {
     return () => document.removeEventListener('scroll', checkProbeVisible)
   }, [checkProbeVisible])
 
-  const { data, get } = useApi<MemzResponse<{ items: MetaItem[] }>>({
+  const { data, get, cache } = useApi<MemzResponse<{ items: MetaItem[] }>>({
     path: '/api/repository/list',
     method: 'GET',
     authenticatedCall: true,
@@ -74,5 +74,5 @@ export function useInfinityLoader() {
     checkProbeVisible()
   }, [checkProbeVisible])
 
-  return { bottomProbe, items, setItems, tags, setTags }
+  return { bottomProbe, items, setItems, tags, setTags, cache }
 }
