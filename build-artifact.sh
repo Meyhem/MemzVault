@@ -24,6 +24,7 @@ dotnet --version || die "No dotnet install"
 node --version || die "No nodejs install"
 npm --version || die "No npm install"
 yarn --version || die "No yarn install"
+git --version || die "No git install"
 
 stage "Prepare ground"
 
