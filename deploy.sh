@@ -78,7 +78,7 @@ stage "Configure"
 cp appsettings.Production.json $ARTIFACT/backend/appsettings.json
 
 stage "Nginx"
-cp memzvault.nginx.conf /etc/nginx/conf.d/memzvault.nginx.conf
+cp memzvault.nginx.conf /etc/nginx/memzvault.nginx.conf
 
 stage "Stop services"
 BACKENDSTATUS=`systemctl is-active memzvault`
