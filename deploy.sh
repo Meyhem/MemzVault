@@ -97,6 +97,7 @@ rm -rf DEPLOY_FOLDER/backend
 cp -r $ARTIFACT/backend $DEPLOY_FOLDER/backend
 
 stage "Start services"
+systemctl daemon-reload
 systemctl start memzvault
 systemctl enable memzvault
 nginx -s reload
