@@ -20,7 +20,7 @@ stage() {
 test -f $APPSETTINGS || die "Missing production config file path (first positional argument)"
 
 stage "Check tools"
-dotnet --version || die "No dotnet install"
+dotnet --info || die "No dotnet install"
 node --version || die "No nodejs install"
 npm --version || die "No npm install"
 yarn --version || die "No yarn install"
