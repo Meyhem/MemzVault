@@ -64,6 +64,7 @@ export const LoginPage = () => {
                     }}
                     label="Repository"
                     component={Input}
+                    htmlType="text"
                     input={field.input}
                     meta={field.meta}
                   />
