@@ -58,7 +58,7 @@ stage "Prepare ground"
 
 rm -rf $ARTIFACT
 mkdir -p $ARTIFACT
-git pull https://github.com/Meyhem/MemzVault master
+git pull --ff-only https://github.com/Meyhem/MemzVault master 
 if [ ! -f appsettings.Production.json ]; then
   echo "Generating prod config 'appsettings.Production.json'"
   echo  "$CONFIG" > appsettings.Production.json
