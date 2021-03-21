@@ -17,20 +17,33 @@ Simple encrypted storage for images & videos.
 - node
 - git
 - nginx
-- certbot (see their installation guide for your OS)
 - CentOS8 (Anything with SystemD should suffice)
 
 # First deploy
 1. Install all required deps
-2. Configure Nginx
+2. Configure Nginx (See snipped below, the "include" is copied to place by "deploy.sh" later)
 3. Choose long-term working folder for deploys, e.g. /root (will be reused for deploys)
 4. Pull sources from this repo
 5. run "sh deploy.sh" (It generates appsettings.Prod.json, write down or provide your own "AdminKey", needed for Repository creation, can be any string)
+6. CONFIGURE TLS! With certbot or your own method. Without TLS its all pointless...
 
+```nginx
+server {
+  listen 80;
+  server_name "my-server.com" "www.my-server.com";
+
+  include /etc/nginx/memzvault.nginx.conf;
+}
+```
 
 App should be up and running. To update deployment to never version just pull the repo & run "sh deploy.sh" again. It will not regenerate the production config, so your keys will stay.
 
 After deployment, don't delete the pulled sources, if you delete appsettings.Production.json it will be regenerated with different keys (ServerKey & AdminKey are not used for data encryption so you will not loose your data even if you regenerate it).
+
+*crontab -e* for certbot cert reload (If you use certbot)
+```cron
+0 0 * * 0 root /usr/bin/certbot renew --post-hook "/usr/sbin/nginx -s reload"
+```
 
 # Security
 ## File encryption scheme
@@ -78,19 +91,3 @@ This token gives full access to repository.
 2. **Lost AdminKey** - Can't create new repos, data are OK, just put new one to appsettings.Production.json
 3. **Lost Repository Passphrase** - Your data are lost, undecryptable. There is not backup or recovery. *nelson_haw_haw.png*
 
-# NGINX
-
-```nginx
-server {
-  listen 80;
-  server_name "my-server.com" "www.my-server.com";
-
-  include /etc/nginx/memzvault.nginx.conf;
-}
-```
-
-# Cron
-
-```
-0 0 * * 0 root /usr/bin/certbot renew --post-hook "/usr/sbin/nginx -s reload"
-```
