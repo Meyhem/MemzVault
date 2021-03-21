@@ -1,6 +1,12 @@
 # MemzVault
 
-Encrypted storage for images & videos.
+Simple encrypted storage for images & videos.
+
+![image](https://user-images.githubusercontent.com/6241657/111897333-a1e9b780-8a1f-11eb-9b48-7b615d7175c1.png)
+
+- AES256CBC encrypted storage (not E2E encryption)
+- Primitive UI, Upload batches, Download from URL
+- Multiple separated repositories
 
 # Server requirements
 
