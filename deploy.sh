@@ -54,6 +54,7 @@ node --version || die "No nodejs install"
 npm --version || die "No npm install"
 yarn --version || die "No yarn install"
 git --version || die "No git install"
+nginx -h || die "No nginx install"
 
 # clean artifacts, create deploy dest
 stage "Prepare ground"
